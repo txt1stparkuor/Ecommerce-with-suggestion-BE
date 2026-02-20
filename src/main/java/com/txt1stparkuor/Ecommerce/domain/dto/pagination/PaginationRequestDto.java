@@ -1,0 +1,32 @@
+package com.txt1stparkuor.Ecommerce.domain.dto.pagination;
+
+import com.txt1stparkuor.Ecommerce.constant.CommonConstant;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class PaginationRequestDto {
+
+    private Integer pageNum = 1;
+
+    private Integer pageSize = 10;
+
+    public int getPageNum() {
+        if (this.pageNum == null || this.pageNum < 1) {
+            return 0;
+        }
+        return this.pageNum - 1;
+    }
+
+    public int getPageSize() {
+        if (this.pageSize == null || this.pageSize < 1) {
+            return CommonConstant.PAGE_SIZE_DEFAULT;
+        }
+        return this.pageSize;
+    }
+}
