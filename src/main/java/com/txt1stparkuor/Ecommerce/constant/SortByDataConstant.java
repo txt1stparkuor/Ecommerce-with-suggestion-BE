@@ -18,6 +18,9 @@ public enum SortByDataConstant {
     ),
     ORDER(
             Set.of("createdAt", "totalAmount")
+    ),
+    CATEGORY(
+            Set.of("name")
     );
 
     private final Set<String> allowedFields;

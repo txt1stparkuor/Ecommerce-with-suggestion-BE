@@ -3,12 +3,14 @@ package com.txt1stparkuor.Ecommerce.controller;
 import com.txt1stparkuor.Ecommerce.base.RestApiV1;
 import com.txt1stparkuor.Ecommerce.base.VsResponseUtil;
 import com.txt1stparkuor.Ecommerce.constant.UrlConstant;
+import com.txt1stparkuor.Ecommerce.domain.dto.pagination.PaginationRequestDto;
 import com.txt1stparkuor.Ecommerce.domain.dto.pagination.PaginationSortRequestDto;
 import com.txt1stparkuor.Ecommerce.domain.dto.request.ProductCreationRequest;
 import com.txt1stparkuor.Ecommerce.domain.dto.request.ProductFilterRequest;
 import com.txt1stparkuor.Ecommerce.domain.dto.request.ProductUpdateRequest;
 import com.txt1stparkuor.Ecommerce.domain.dto.request.ReviewRequest;
 import com.txt1stparkuor.Ecommerce.service.ProductService;
+import com.txt1stparkuor.Ecommerce.service.RecommendationService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ProductController {
 
     ProductService productService;
+    RecommendationService recommendationService;
 
     @GetMapping(UrlConstant.Product.PRODUCT_COMMON)
     public ResponseEntity<?> getAllProducts(@Valid ProductFilterRequest filterDto) {
@@ -69,5 +74,16 @@ public class ProductController {
     public ResponseEntity<?> deleteProduct(@PathVariable String id) {
         productService.deleteProduct(id);
         return VsResponseUtil.success(HttpStatus.NO_CONTENT, null);
+    }
+
+    @GetMapping(UrlConstant.Product.PRODUCT_RECOMMENDATIONS)
+    public ResponseEntity<?> getSimilarProducts(@PathVariable String id, @Valid PaginationRequestDto request) {
+        return VsResponseUtil.success(recommendationService.getSimilarProducts(id, request));
+    }
+
+    @GetMapping(UrlConstant.Product.PRODUCT_RECOMMENDATIONS_HYBRID)
+    public ResponseEntity<?> getHybridProductsRecommendations(@PathVariable String id, @Valid PaginationRequestDto request) {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        return VsResponseUtil.success(recommendationService.getHybridProductsRecommendations(id, userId, request));
     }
 }

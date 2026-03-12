@@ -3,9 +3,11 @@ package com.txt1stparkuor.Ecommerce.controller;
 import com.txt1stparkuor.Ecommerce.base.RestApiV1;
 import com.txt1stparkuor.Ecommerce.base.VsResponseUtil;
 import com.txt1stparkuor.Ecommerce.constant.UrlConstant;
+import com.txt1stparkuor.Ecommerce.domain.dto.pagination.PaginationRequestDto;
 import com.txt1stparkuor.Ecommerce.domain.dto.request.UserCreationRequest;
 import com.txt1stparkuor.Ecommerce.domain.dto.request.UserFilterRequest;
 import com.txt1stparkuor.Ecommerce.domain.dto.request.UserUpdateRequest;
+import com.txt1stparkuor.Ecommerce.service.RecommendationService;
 import com.txt1stparkuor.Ecommerce.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -14,6 +16,8 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestApiV1
@@ -22,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     UserService userService;
+    RecommendationService recommendationService;
 
     @GetMapping(UrlConstant.User.GET_CURRENT_USER)
     public ResponseEntity<?> getMyInfo() {
@@ -55,5 +60,12 @@ public class UserController {
     @GetMapping(UrlConstant.User.USER_ID)
     public ResponseEntity<?> getUserById(@PathVariable String id) {
         return VsResponseUtil.success(userService.getUserById(id));
+    }
+
+    @GetMapping(UrlConstant.User.USER_RECOMMENDATIONS)
+    public ResponseEntity<?> getUserRecommendations(@Valid PaginationRequestDto request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = authentication.getName();
+        return VsResponseUtil.success(recommendationService.getUserRecommendations(userId, request));
     }
 }

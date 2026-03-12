@@ -105,7 +105,7 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.User.ERR_NOT_FOUND_ID, new String[]{userId}));
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.User.ERR_NOT_FOUND_ID));
 
         Review review = Review.builder()
                 .rating(request.getRating())
@@ -116,6 +116,7 @@ public class ProductServiceImpl implements ProductService {
 
         reviewRepository.save(review);
 
+        // Update product rating stats
         int currentCount = product.getRatingCount() != null ? product.getRatingCount() : 0;
         double currentAverage = product.getAverageRating() != null ? product.getAverageRating() : 0.0;
 
@@ -133,6 +134,10 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse createProduct(ProductCreationRequest request, MultipartFile imageFile) {
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+
+        if (category.getChildren() != null && !category.getChildren().isEmpty()) {
+            throw new InvalidException(ErrorMessage.Product.ERR_CATEGORY_NOT_LEAF);
+        }
 
         Product product = productMapper.toProduct(request);
         product.setCategory(category);
@@ -158,6 +163,10 @@ public class ProductServiceImpl implements ProductService {
         if (request.getCategoryId() != null) {
             Category category = categoryRepository.findById(request.getCategoryId())
                     .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+
+            if (category.getChildren() != null && !category.getChildren().isEmpty()) {
+                throw new InvalidException(ErrorMessage.Product.ERR_CATEGORY_NOT_LEAF);
+            }
             product.setCategory(category);
         }
 

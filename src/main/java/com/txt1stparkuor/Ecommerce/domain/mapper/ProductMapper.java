@@ -11,8 +11,9 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
 
-    @Mapping(source = "category.name", target = "categoryName")
+    @Mapping(target = "categoryPath", expression = "java(product.getCategory() != null ? product.getCategory().getFullPath() : null)")
     @Mapping(target = "discountPercentage", expression = "java(calculateDiscount(product))")
+    @Mapping(target = "categoryId", expression = "java(product.getCategory() != null ? product.getCategory().getId() : null)")
     ProductResponse toProductResponse(Product product);
 
     List<ProductResponse> toListProductResponse(List<Product> products);

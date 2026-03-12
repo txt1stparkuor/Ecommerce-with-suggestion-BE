@@ -19,6 +19,7 @@ public class ProductResponse {
     private Integer stockQuantity;
     private Double averageRating;
     private Long ratingCount;
-    private String categoryName;
+    private String categoryId;
+    private String categoryPath;
     private Double discountPercentage;
 }

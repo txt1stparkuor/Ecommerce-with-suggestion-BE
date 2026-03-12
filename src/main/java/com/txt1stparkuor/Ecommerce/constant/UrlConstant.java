@@ -22,6 +22,7 @@ public class UrlConstant {
         public static final String GET_CLASS_USER = USER_ID + "/classrooms";
         public static final String GET_MY_POSTS = GET_CURRENT_USER + "/posts";
         public static final String RESET_USERS = PRE_FIX + "/reset";
+        public static final String USER_RECOMMENDATIONS = PRE_FIX + "/recommendations";
 
         private User() {
         }
@@ -32,6 +33,8 @@ public class UrlConstant {
         public static final String PRODUCT_COMMON = PRE_FIX;
         public static final String PRODUCT_ID = PRE_FIX + "/{id}";
         public static final String PRODUCT_REVIEWS = PRODUCT_ID + "/reviews";
+        public static final String PRODUCT_RECOMMENDATIONS = PRODUCT_ID + "/recommendations";
+        public static final String PRODUCT_RECOMMENDATIONS_HYBRID = PRODUCT_ID + "/recommendations/hybrid";
 
 
         private Product() {
@@ -55,6 +58,7 @@ public class UrlConstant {
         private static final String PRE_FIX = "/categories";
         public static final String CATEGORY_COMMON = PRE_FIX;
         public static final String CATEGORIES_WITH_PRODUCTS = PRE_FIX + "/with-products";
+        public static final String LEAF_CATEGORIES = PRE_FIX + "/leaf";
 
 
         private Category() {
@@ -81,6 +85,14 @@ public class UrlConstant {
 
 
         private Order() {
+        }
+    }
+
+    public static class Export {
+        private static final String PRE_FIX = "/export";
+        public static final String EXPORT_AMAZON_CSV = PRE_FIX + "/amazon.csv";
+
+        private Export() {
         }
     }
 }
