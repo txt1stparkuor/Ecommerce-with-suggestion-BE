@@ -1,7 +1,7 @@
 package com.txt1stparkuor.Ecommerce.util;
 
 import com.txt1stparkuor.Ecommerce.constant.CommonConstant;
-import com.txt1stparkuor.Ecommerce.constant.SortByDataConstant;
+import com.txt1stparkuor.Ecommerce.constant.enums.SortByDataConstant;
 import com.txt1stparkuor.Ecommerce.domain.dto.pagination.PaginationRequestDto;
 import com.txt1stparkuor.Ecommerce.domain.dto.pagination.PaginationSortRequestDto;
 import com.txt1stparkuor.Ecommerce.domain.dto.pagination.PagingMeta;

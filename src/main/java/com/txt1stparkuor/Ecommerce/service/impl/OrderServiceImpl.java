@@ -1,7 +1,8 @@
 package com.txt1stparkuor.Ecommerce.service.impl;
 
 import com.txt1stparkuor.Ecommerce.constant.ErrorMessage;
-import com.txt1stparkuor.Ecommerce.constant.SortByDataConstant;
+import com.txt1stparkuor.Ecommerce.constant.enums.SortByDataConstant;
+import com.txt1stparkuor.Ecommerce.constant.enums.OrderStatus;
 import com.txt1stparkuor.Ecommerce.domain.dto.pagination.PagingMeta;
 import com.txt1stparkuor.Ecommerce.domain.dto.pagination.PaginationResponseDto;
 import com.txt1stparkuor.Ecommerce.domain.dto.request.OrderFilterRequest;

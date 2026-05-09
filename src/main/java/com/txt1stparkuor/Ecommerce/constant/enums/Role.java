@@ -1,4 +1,4 @@
-package com.txt1stparkuor.Ecommerce.constant;
+package com.txt1stparkuor.Ecommerce.constant.enums;
 
 public enum Role {
     USER,

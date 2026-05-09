@@ -1,7 +1,7 @@
 package com.txt1stparkuor.Ecommerce.domain.dto.request;
 
 import com.txt1stparkuor.Ecommerce.domain.dto.pagination.PaginationFullRequestDto;
-import com.txt1stparkuor.Ecommerce.domain.entity.OrderStatus;
+import com.txt1stparkuor.Ecommerce.constant.enums.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
