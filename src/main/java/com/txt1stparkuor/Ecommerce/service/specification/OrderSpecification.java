@@ -2,7 +2,7 @@ package com.txt1stparkuor.Ecommerce.service.specification;
 
 import com.txt1stparkuor.Ecommerce.domain.dto.request.OrderFilterRequest;
 import com.txt1stparkuor.Ecommerce.domain.entity.Order;
-import com.txt1stparkuor.Ecommerce.domain.entity.OrderStatus;
+import com.txt1stparkuor.Ecommerce.constant.enums.OrderStatus;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;

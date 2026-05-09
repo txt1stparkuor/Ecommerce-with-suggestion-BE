@@ -1,5 +1,6 @@
-package com.txt1stparkuor.Ecommerce.constant;
+package com.txt1stparkuor.Ecommerce.constant.enums;
 
+import com.txt1stparkuor.Ecommerce.constant.ErrorMessage;
 import lombok.Getter;
 
 import java.util.Optional;

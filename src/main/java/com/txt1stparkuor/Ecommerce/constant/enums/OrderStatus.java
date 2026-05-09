@@ -1,4 +1,4 @@
-package com.txt1stparkuor.Ecommerce.domain.entity;
+package com.txt1stparkuor.Ecommerce.constant.enums;
 
 public enum OrderStatus {
     PENDING,
