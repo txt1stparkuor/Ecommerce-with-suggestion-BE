@@ -43,7 +43,6 @@ public class CategoryServiceImpl implements CategoryService {
         Specification<Category> spec = categorySpecification.filter(filterDto);
         List<Category> categories = categoryRepository.findAll(spec);
 
-        // 3. Map to Response DTOs
         return categoryMapper.toListCategoryResponse(categories);
     }
 }
