@@ -3,9 +3,7 @@ package com.txt1stparkuor.Ecommerce.controller;
 import com.txt1stparkuor.Ecommerce.base.RestApiV1;
 import com.txt1stparkuor.Ecommerce.base.VsResponseUtil;
 import com.txt1stparkuor.Ecommerce.constant.UrlConstant;
-import com.txt1stparkuor.Ecommerce.domain.dto.request.LoginRequest;
-import com.txt1stparkuor.Ecommerce.domain.dto.request.RefreshTokenRequest;
-import com.txt1stparkuor.Ecommerce.domain.dto.request.RegisterRequest;
+import com.txt1stparkuor.Ecommerce.domain.dto.request.*;
 import com.txt1stparkuor.Ecommerce.service.AuthenticationService;
 import com.txt1stparkuor.Ecommerce.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -73,5 +71,17 @@ public class AuthenticationController {
     @PostMapping(UrlConstant.Auth.REFRESH_TOKEN)
     public ResponseEntity<?> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
         return VsResponseUtil.success(authenticationService.refreshToken(request));
+    }
+
+    @PostMapping(UrlConstant.Auth.FORGOT_PASSWORD)
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        authenticationService.forgotPassword(request);
+        return VsResponseUtil.success("If an account exists, a reset link has been sent.");
+    }
+
+    @PostMapping(UrlConstant.Auth.RESET_PASSWORD)
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        authenticationService.resetPassword(request);
+        return VsResponseUtil.success("Password has been reset.");
     }
 }

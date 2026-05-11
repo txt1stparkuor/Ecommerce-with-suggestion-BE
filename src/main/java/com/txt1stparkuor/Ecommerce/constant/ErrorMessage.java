@@ -70,4 +70,9 @@ public class ErrorMessage {
     public static class Order {
         public static final String ERR_CANCEL_ORDER = "Order cannot be cancelled in its current state.";
     }
+
+    public static class PasswordResetToken {
+        public static final String INVALID_TOKEN = "Invalid token";
+        public static final String TOKEN_EXPIRED = "Token expired";
+    }
 }
