@@ -20,9 +20,6 @@ public class UserUpdateRequest {
     @Schema(description = "Username of the user", example = "user123")
     private String username;
 
-    @Schema(description = "Password of the user", example = "Password123!")
-    private String password;
-
     @Email(message = ErrorMessage.Validation.INVALID_FORMAT_FIELD)
     @Schema(description = "Email address of the user", example = "user@example.com")
     private String email;

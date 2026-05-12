@@ -84,4 +84,10 @@ public class AuthenticationController {
         authenticationService.resetPassword(request);
         return VsResponseUtil.success("Password has been reset.");
     }
+
+    @PostMapping(UrlConstant.Auth.CHANGE_PASSWORD)
+    public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
+        authenticationService.changePassword(request);
+        return VsResponseUtil.success("Password has been changed.");
+    }
 }
