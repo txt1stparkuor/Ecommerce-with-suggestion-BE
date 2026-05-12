@@ -2,6 +2,8 @@ package com.txt1stparkuor.Ecommerce.constant;
 
 public class UrlConstant {
 
+    public static final String BASE_URL = "/api/v1";
+
     public static class Auth {
         private static final String PRE_FIX = "/auth";
         public static final String LOGIN = PRE_FIX + "/login";
@@ -9,6 +11,7 @@ public class UrlConstant {
         public static final String REFRESH_TOKEN = PRE_FIX + "/refresh-token";
         public static final String FORGOT_PASSWORD = PRE_FIX + "/forgot-password";
         public static final String RESET_PASSWORD = PRE_FIX + "/reset-password";
+        public static final String CHANGE_PASSWORD = PRE_FIX + "/change-password";
 
         private Auth() {
         }
@@ -90,6 +93,10 @@ public class UrlConstant {
         }
     }
 
+    public static class Review {
+        private static final String PRE_FIX = "/reviews";
+    }
+
     public static class Export {
         private static final String PRE_FIX = "/export";
         public static final String EXPORT_AMAZON_CSV = PRE_FIX + "/amazon.csv";
@@ -97,4 +104,18 @@ public class UrlConstant {
         private Export() {
         }
     }
+
+    public static final String[] PUBLIC_POST_END_POINTS = {
+            BASE_URL + Auth.LOGIN,
+            BASE_URL + Auth.REGISTER,
+            BASE_URL + Auth.FORGOT_PASSWORD,
+            BASE_URL + Auth.RESET_PASSWORD,
+            BASE_URL + Auth.REFRESH_TOKEN
+    };
+
+    public static final String[] PUBLIC_GET_END_POINTS = {
+            BASE_URL + Category.CATEGORY_COMMON + "/**",
+            BASE_URL + Product.PRODUCT_COMMON + "/**",
+            BASE_URL + Review.PRE_FIX + "/**"
+    };
 }

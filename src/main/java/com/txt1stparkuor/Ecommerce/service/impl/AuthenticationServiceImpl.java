@@ -1,10 +1,7 @@
 package com.txt1stparkuor.Ecommerce.service.impl;
 
 import com.txt1stparkuor.Ecommerce.constant.ErrorMessage;
-import com.txt1stparkuor.Ecommerce.domain.dto.request.ForgotPasswordRequest;
-import com.txt1stparkuor.Ecommerce.domain.dto.request.LoginRequest;
-import com.txt1stparkuor.Ecommerce.domain.dto.request.RefreshTokenRequest;
-import com.txt1stparkuor.Ecommerce.domain.dto.request.ResetPasswordRequest;
+import com.txt1stparkuor.Ecommerce.domain.dto.request.*;
 import com.txt1stparkuor.Ecommerce.domain.dto.response.AuthenticationResponse;
 import com.txt1stparkuor.Ecommerce.domain.entity.PasswordResetToken;
 import com.txt1stparkuor.Ecommerce.domain.entity.User;
@@ -121,5 +118,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
         tokenRepository.delete(resetToken);
+    }
+
+    @Override
+    @Transactional
+    public void changePassword(ChangePasswordRequest request) {
+        String currentUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.User.ERR_NOT_FOUND_ID, new String[]{currentUserId}));
+
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new InvalidException(ErrorMessage.Auth.INCORRECT_OLD_PASSWORD);
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
     }
 }

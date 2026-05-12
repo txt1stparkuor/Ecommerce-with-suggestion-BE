@@ -1,9 +1,6 @@
 package com.txt1stparkuor.Ecommerce.service;
 
-import com.txt1stparkuor.Ecommerce.domain.dto.request.ForgotPasswordRequest;
-import com.txt1stparkuor.Ecommerce.domain.dto.request.LoginRequest;
-import com.txt1stparkuor.Ecommerce.domain.dto.request.RefreshTokenRequest;
-import com.txt1stparkuor.Ecommerce.domain.dto.request.ResetPasswordRequest;
+import com.txt1stparkuor.Ecommerce.domain.dto.request.*;
 import com.txt1stparkuor.Ecommerce.domain.dto.response.AuthenticationResponse;
 
 public interface AuthenticationService {
@@ -14,4 +11,6 @@ public interface AuthenticationService {
     void forgotPassword(ForgotPasswordRequest request);
 
     void resetPassword(ResetPasswordRequest request);
+
+    void changePassword(ChangePasswordRequest request);
 }
