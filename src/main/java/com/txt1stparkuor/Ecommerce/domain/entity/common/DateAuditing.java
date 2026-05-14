@@ -1,5 +1,6 @@
 package com.txt1stparkuor.Ecommerce.domain.entity.common;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
@@ -17,8 +18,10 @@ import java.time.Instant;
 public abstract class DateAuditing {
 
     @CreatedDate
+    @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
     @LastModifiedDate
+    @Column(nullable = false)
     private Instant updatedAt;
 }
