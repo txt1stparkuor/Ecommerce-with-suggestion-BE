@@ -5,6 +5,7 @@ import com.txt1stparkuor.Ecommerce.domain.entity.common.DateAuditing;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -23,6 +24,9 @@ public class Order extends DateAuditing {
     @Column(unique = true, nullable = false, updatable = false)
     private String orderCode;
 
+    @Column(unique = true, updatable = false)
+    private String idempotencyKey;
+
     private Double totalAmount;
 
     @Enumerated(EnumType.STRING)
@@ -30,12 +34,13 @@ public class Order extends DateAuditing {
 
     private String shippingAddress;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Builder.Default
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderDetail> orderDetails;
+    private List<OrderDetail> orderDetails = new ArrayList<>();
 
     @PrePersist
     public void generateOrderCode() {
