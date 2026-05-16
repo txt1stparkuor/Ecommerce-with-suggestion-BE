@@ -1,27 +1,5 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
---
--- Host: localhost    Database: ecommerce
--- ------------------------------------------------------
--- Server version	8.0.35
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
---
--- Table structure for table `cart_items`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
 SET FOREIGN_KEY_CHECKS = 0;
+
 CREATE TABLE `cart_items` (
   `id` varchar(255) NOT NULL,
   `created_at` datetime(6) NOT NULL,
@@ -35,14 +13,7 @@ CREATE TABLE `cart_items` (
   CONSTRAINT `FK1re40cjegsfvw58xrkdp6bac6` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`),
   CONSTRAINT `FKpcttvuq4mxppo8sxggjtn5i2c` FOREIGN KEY (`cart_id`) REFERENCES `carts` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `carts`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `carts` (
   `id` varchar(255) NOT NULL,
   `created_at` datetime(6) NOT NULL,
@@ -52,14 +23,7 @@ CREATE TABLE `carts` (
   UNIQUE KEY `UK64t7ox312pqal3p7fg9o503c2` (`user_id`),
   CONSTRAINT `FKb5o626f86h46m4s7ms6ginnop` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `categories`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `categories` (
   `id` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
@@ -70,14 +34,7 @@ CREATE TABLE `categories` (
   KEY `FKsaok720gsu4u2wrgbk10b5n8d` (`parent_id`),
   CONSTRAINT `FKsaok720gsu4u2wrgbk10b5n8d` FOREIGN KEY (`parent_id`) REFERENCES `categories` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `order_details`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `order_details` (
   `id` varchar(255) NOT NULL,
   `created_at` datetime(6) NOT NULL,
@@ -92,14 +49,7 @@ CREATE TABLE `order_details` (
   CONSTRAINT `FK4q98utpd73imf4yhttm3w0eax` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`),
   CONSTRAINT `FKjyu2qbqt8gnvno9oe9j2s2ldk` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `orders`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `orders` (
   `id` varchar(255) NOT NULL,
   `created_at` datetime(6) NOT NULL,
@@ -116,14 +66,7 @@ CREATE TABLE `orders` (
   KEY `FK32ql8ubntj5uh44ph9659tiih` (`user_id`),
   CONSTRAINT `FK32ql8ubntj5uh44ph9659tiih` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `password_reset_token`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `password_reset_token` (
   `id` varchar(255) NOT NULL,
   `expiry_date` datetime(6) NOT NULL,
@@ -134,14 +77,7 @@ CREATE TABLE `password_reset_token` (
   UNIQUE KEY `UKf90ivichjaokvmovxpnlm5nin` (`user_id`),
   CONSTRAINT `FK83nsrttkwkb6ym0anu051mtxn` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `products`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `products` (
   `id` varchar(255) NOT NULL,
   `average_rating` double DEFAULT NULL,
@@ -160,14 +96,7 @@ CREATE TABLE `products` (
   KEY `FKog2rp4qthbtt2lfyhfo32lsw9` (`category_id`),
   CONSTRAINT `FKog2rp4qthbtt2lfyhfo32lsw9` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `reviews`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `reviews` (
   `id` varchar(255) NOT NULL,
   `comment` longtext,
@@ -182,14 +111,7 @@ CREATE TABLE `reviews` (
   CONSTRAINT `FKcgy7qjc1r99dp117y9en6lxye` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
   CONSTRAINT `FKpl51cejpw4gy5swfar8br9ngi` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `roles`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `roles` (
   `id` varchar(255) NOT NULL,
   `created_at` datetime(6) NOT NULL,
@@ -198,14 +120,7 @@ CREATE TABLE `roles` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `UKofx66keruapi6vyqpv6f2or37` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `user_roles`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `user_roles` (
   `user_id` varchar(255) NOT NULL,
   `role_id` varchar(255) NOT NULL,
@@ -214,35 +129,17 @@ CREATE TABLE `user_roles` (
   CONSTRAINT `FKh8ciramu9cc9q3qcqiv4ue8a6` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`),
   CONSTRAINT `FKhfh9dx7w3ubf1co1vdev94g3f` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `users`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
   `id` varchar(255) NOT NULL,
   `created_at` datetime(6) NOT NULL,
-  `email` varchar(255) DEFAULT NULL,
+  `email` varchar(255) NOT NULL,
   `full_name` varchar(255) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
   `updated_at` datetime(6) NOT NULL,
   `username` varchar(255) NOT NULL,
-  `provider` varchar(255) DEFAULT 'local',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `UKr43af9ap4edm43mmtq01oddj6` (`username`)
+  UNIQUE KEY `UKr43af9ap4edm43mmtq01oddj6` (`username`),
+  UNIQUE KEY `UKr43dflkjerkljer1234421j23` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-SET FOREIGN_KEY_CHECKS = 1;
-
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+SET FOREIGN_KEY_CHECKS = 1
