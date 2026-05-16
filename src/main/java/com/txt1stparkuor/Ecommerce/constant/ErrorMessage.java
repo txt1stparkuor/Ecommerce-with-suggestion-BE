@@ -12,12 +12,13 @@ public class ErrorMessage {
     public static final String FORBIDDEN = "Sorry, you do not have permission to perform this action";
     public static final String INVALID_IMAGE_FILE = "Only PNG, JPG, JPEG, WEBP or GIF images are allowed";
     public static final String INVALID_JSON_FORMAT = "Invalid JSON format. Please check your input.";
-    public static final String TO_MANY_REQUEST = "You have sent too many requests. Please try again later.";
+    public static final String TOO_MANY_REQUEST = "You have sent too many requests. Please try again later.";
     public static final String INCORRECT_PASSWORD = "Incorrect password";
     public static final String NOT_FOUND = "Resource not found";
     public static final String INVALID_SORT_FIELD = "Invalid sort field '%s'. Allowed fields are: %s.";
     public static final String HTTP_METHOD_NOT_SUPPORTED = "This HTTP method is not supported.";
     public static final String CSV_EXPORT_ERROR = "Error exporting csv files";
+    public static final String OPTIMISTIC_LOCK_ERROR = "Sorry! Another customer just bought this item and the stock has changed. Please refresh your cart and try again.";
 
     // Validation Errors (DTOs)
     public static class Validation {
