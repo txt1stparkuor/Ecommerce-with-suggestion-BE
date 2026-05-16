@@ -46,7 +46,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            request.getUsername(),
+                            request.getEmail(),
                             request.getPassword()
                     )
             );
@@ -75,9 +75,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new InvalidException(ErrorMessage.Auth.ERR_INVALID_REFRESH_TOKEN);
         }
 
-        String username = jwtTokenProvider.getUsernameFromToken(request.getRefreshToken());
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.User.USERNAME_NOT_FOUND));
+        String userIdFromToken = jwtTokenProvider.getUserIdFromToken(request.getRefreshToken());
+        User user = userRepository.findById(userIdFromToken)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.User.ERR_NOT_FOUND_ID, new String[]{userIdFromToken}));
 
         UserPrincipal userPrincipal = UserPrincipal.create(user);
         String newAccessToken = jwtTokenProvider.generateToken(userPrincipal, false);
