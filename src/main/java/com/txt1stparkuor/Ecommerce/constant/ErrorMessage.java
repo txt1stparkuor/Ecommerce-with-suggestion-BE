@@ -48,6 +48,7 @@ public class ErrorMessage {
         public static final String ERR_NOT_FOUND_ID = "User not found with id: %s";
         public static final String NOT_FOUND_ONE_OR_MORE = "User not found with id: %s";
         public static final String USERNAME_NOT_FOUND = "User not found with username";
+        public static final String EMAIL_NOT_FOUND = "User not found with email ";
         public static final String INVALID_ROLE = "Invalid role";
         public static final String ERR_NOT_FOUND_USERNAME = "User not found with username: %s";
     }
