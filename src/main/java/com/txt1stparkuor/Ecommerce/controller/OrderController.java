@@ -31,16 +31,19 @@ public class OrderController {
 
     @Operation(
             summary = "Create a new order",
-            description = "Creates a new order for the authenticated user based on the items in their cart."
+            description = "Creates a new order for the authenticated user based on the items in their cart. An 'Idempotency-Key' header need to be provided to prevent duplicate order creation."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Order created successfully"),
             @ApiResponse(responseCode = "404", description = "Cart not found for the user"),
-            @ApiResponse(responseCode = "400", description = "Cart is empty or requested item not in cart or not enough stock for a product")
+            @ApiResponse(responseCode = "400", description = "Cart is empty or requested item not in cart or not enough stock for a product"),
+            @ApiResponse(responseCode = "409", description = "Conflict: An order with the provided Idempotency-Key already exists.")
     })
     @PostMapping(UrlConstant.Order.ORDER_COMMON)
-    public ResponseEntity<?> createOrder(@Valid @RequestBody OrderRequest request) {
-        return VsResponseUtil.success(orderService.createOrder(request));
+    public ResponseEntity<?> createOrder(
+            @RequestHeader(value = "Idempotency-Key") String idempotencyKey,
+            @Valid @RequestBody OrderRequest request) {
+        return VsResponseUtil.success(orderService.createOrder(idempotencyKey, request));
     }
 
     @Operation(
