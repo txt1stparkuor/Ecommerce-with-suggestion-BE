@@ -19,6 +19,8 @@ public class ErrorMessage {
     public static final String HTTP_METHOD_NOT_SUPPORTED = "This HTTP method is not supported.";
     public static final String CSV_EXPORT_ERROR = "Error exporting csv files";
     public static final String OPTIMISTIC_LOCK_ERROR = "Sorry! Another customer just bought this item and the stock has changed. Please refresh your cart and try again.";
+    public static final String IDEMPOTENCY_KEY_MISSING = "Idempotency-Key header is missing.";
+    public static final String IDEMPOTENCY_KEY_ALREADY_USED = "An order with this idempotency key has already been processed.";
 
     // Validation Errors (DTOs)
     public static class Validation {
@@ -61,7 +63,7 @@ public class ErrorMessage {
     }
 
     public static class Product {
-        public static final String ERR_NOT_ENOUGH_STOCK = "Product does not have enough stock.";
+        public static final String ERR_NOT_ENOUGH_STOCK = "Product %s does not have enough stock.";
         public static final String ERR_INVALID_PRICE_RANGE = "Minimum price cannot be greater than maximum price.";
         public static final String ERR_CATEGORY_NOT_LEAF = "Product can only be assigned to a leaf category (a category with no children).";
     }
@@ -73,6 +75,7 @@ public class ErrorMessage {
 
     public static class Order {
         public static final String ERR_CANCEL_ORDER = "Order cannot be cancelled in its current state.";
+        public static final String ERR_RECOVER_IDEMPOTENT = "Error recovering idempotent order";
     }
 
     public static class PasswordResetToken {
