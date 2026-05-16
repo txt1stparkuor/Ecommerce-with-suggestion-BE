@@ -4,6 +4,7 @@ import com.txt1stparkuor.Ecommerce.base.RestData;
 import com.txt1stparkuor.Ecommerce.base.VsResponseUtil;
 import com.txt1stparkuor.Ecommerce.constant.ErrorMessage;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -118,6 +119,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<RestData<?>> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
         return VsResponseUtil.error(HttpStatus.METHOD_NOT_ALLOWED, ErrorMessage.HTTP_METHOD_NOT_SUPPORTED);
 
+    }
+
+    @ExceptionHandler(OptimisticLockingFailureException.class)
+    public ResponseEntity<RestData<?>> handleOptimisticLockingFailureException(OptimisticLockingFailureException ex) {
+        return VsResponseUtil.error(HttpStatus.CONFLICT, ErrorMessage.OPTIMISTIC_LOCK_ERROR);
     }
 
 
