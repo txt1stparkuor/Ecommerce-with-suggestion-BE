@@ -4,6 +4,7 @@ import com.txt1stparkuor.Ecommerce.constant.ErrorMessage;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,5 +24,6 @@ public class LoginRequest {
 
     @Schema(description = "Password of the user", example = "password123")
     @NotBlank(message = ErrorMessage.Validation.NOT_BLANK)
+    @Size(max = 128)
     private String password;
 }
