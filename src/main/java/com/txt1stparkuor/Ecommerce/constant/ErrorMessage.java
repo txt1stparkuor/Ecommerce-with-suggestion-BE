@@ -25,7 +25,7 @@ public class ErrorMessage {
     // Validation Errors (DTOs)
     public static class Validation {
         public static final String NOT_BLANK = "Cannot be blank";
-        public static final String INVALID_FORMAT_PASSWORD = "Password is not strong enough (at least 6 characters, including letters and numbers)";
+        public static final String INVALID_FORMAT_PASSWORD = "Password is not strong enough (at least 6 characters, max 100 characters, including letters and numbers)";
         public static final String NOT_NULL = "This field is required";
         public static final String NOT_EMPTY = "This field cannot be empty";
         public static final String INVALID_FORMAT_FIELD = "Invalid format";
@@ -36,6 +36,7 @@ public class ErrorMessage {
         public static final String INVALID_TYPE_VALUE = "Invalid value '%s' for this field.";
         public static final String MUST_BE_JSON_STRING = "This field must be a valid JSON string.";
         public static final String INVALID_SCORE = "Invalid rating. Must be between 1 and 5.";
+        public static final String INVALID_USERNAME_LENGTH = "Username must be between 4 and 50 characters";
     }
 
     public static class Auth {

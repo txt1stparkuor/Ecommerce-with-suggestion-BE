@@ -4,6 +4,7 @@ import com.txt1stparkuor.Ecommerce.constant.ErrorMessage;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,11 +19,15 @@ import lombok.NoArgsConstructor;
 public class UserCreationRequest {
 
     @NotBlank(message = ErrorMessage.Validation.NOT_BLANK)
-    @Size(min = 4, max = 50, message = "Username must be between 4 and 50 characters")
+    @Size(min = 4, max = 50, message = ErrorMessage.Validation.INVALID_USERNAME_LENGTH)
     @Schema(description = "Username of the user", example = "user123")
     private String username;
 
-    @NotBlank(message = ErrorMessage.Validation.NOT_BLANK)
+    @Size(min = 6, max = 100, message = ErrorMessage.Validation.INVALID_FORMAT_PASSWORD)
+    @Pattern(
+            regexp = "^(?=.*[A-Za-z])(?=.*\\d).*$",
+            message = ErrorMessage.Validation.INVALID_FORMAT_PASSWORD
+    )
     @Schema(description = "Password of the user", example = "Password123!")
     private String password;
 
