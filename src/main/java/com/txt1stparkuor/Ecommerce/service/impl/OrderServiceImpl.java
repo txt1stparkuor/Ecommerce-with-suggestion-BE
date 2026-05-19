@@ -1,9 +1,10 @@
 package com.txt1stparkuor.Ecommerce.service.impl;
 
 import com.txt1stparkuor.Ecommerce.constant.ErrorMessage;
-import com.txt1stparkuor.Ecommerce.constant.SortByDataConstant;
-import com.txt1stparkuor.Ecommerce.domain.dto.pagination.PagingMeta;
+import com.txt1stparkuor.Ecommerce.constant.enums.OrderStatus;
+import com.txt1stparkuor.Ecommerce.constant.enums.SortByDataConstant;
 import com.txt1stparkuor.Ecommerce.domain.dto.pagination.PaginationResponseDto;
+import com.txt1stparkuor.Ecommerce.domain.dto.pagination.PagingMeta;
 import com.txt1stparkuor.Ecommerce.domain.dto.request.OrderFilterRequest;
 import com.txt1stparkuor.Ecommerce.domain.dto.request.OrderRequest;
 import com.txt1stparkuor.Ecommerce.domain.dto.request.UpdateOrderStatusRequest;
@@ -19,17 +20,17 @@ import com.txt1stparkuor.Ecommerce.service.OrderService;
 import com.txt1stparkuor.Ecommerce.service.specification.OrderSpecification;
 import com.txt1stparkuor.Ecommerce.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,9 +45,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderResponse createOrder(OrderRequest request) {
+    public OrderResponse createOrder(String idempotencyKey, OrderRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
+        Optional<Order> existingOrder = orderRepository.findByIdempotencyKeyAndUserId(idempotencyKey, userId);
+        if (existingOrder.isPresent()) {
+            return orderMapper.toOrderResponse(existingOrder.get());
+        }
 
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
@@ -58,6 +63,7 @@ public class OrderServiceImpl implements OrderService {
         Set<String> requestedItemIds = Set.copyOf(request.getCartItemIds());
         List<CartItem> itemsToOrder = cart.getCartItems().stream()
                 .filter(item -> requestedItemIds.contains(item.getId()))
+                .sorted(Comparator.comparing(item -> item.getProduct().getId()))
                 .collect(Collectors.toList());
 
         if (itemsToOrder.size() != requestedItemIds.size()) {
@@ -71,14 +77,15 @@ public class OrderServiceImpl implements OrderService {
                 .user(cart.getUser())
                 .shippingAddress(request.getShippingAddress())
                 .status(OrderStatus.PENDING)
+                .idempotencyKey(idempotencyKey)
                 .build();
 
         for (CartItem cartItem : itemsToOrder) {
             Product product = cartItem.getProduct();
             if (product.getStockQuantity() < cartItem.getQuantity()) {
-                throw new InvalidException(ErrorMessage.Product.ERR_NOT_ENOUGH_STOCK);
+                throw new InvalidException(ErrorMessage.Product.ERR_NOT_ENOUGH_STOCK,
+                        new String[]{product.getName()}, HttpStatus.CONFLICT);
             }
-
             product.setStockQuantity(product.getStockQuantity() - cartItem.getQuantity());
             productRepository.save(product);
 
@@ -96,7 +103,14 @@ public class OrderServiceImpl implements OrderService {
         order.setTotalAmount(totalAmount);
         order.setOrderDetails(orderDetails);
 
-        orderRepository.save(order);
+        try {
+            orderRepository.save(order);
+
+        } catch (DataIntegrityViolationException e) {
+            Order recoveredOrder = orderRepository.findByIdempotencyKeyAndUserId(idempotencyKey, userId)
+                    .orElseThrow(() -> new NotFoundException(ErrorMessage.Order.ERR_RECOVER_IDEMPOTENT));
+            return orderMapper.toOrderResponse(recoveredOrder);
+        }
         
         cart.getCartItems().removeAll(itemsToOrder);
         cartRepository.save(cart);

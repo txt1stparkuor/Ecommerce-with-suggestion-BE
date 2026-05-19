@@ -1,23 +1,21 @@
 package com.txt1stparkuor.Ecommerce.domain.entity;
 
+import com.txt1stparkuor.Ecommerce.domain.entity.common.DateAuditing;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Entity
 @Table(name = "users")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EntityListeners(AuditingEntityListener.class)
-public class User {
+public class User extends DateAuditing {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -28,6 +26,7 @@ public class User {
 
     private String password;
 
+    @Column(unique = true, nullable = false)
     private String email;
 
     private String fullName;
@@ -41,19 +40,12 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @Builder.Default
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<Role> roles;
-
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private Instant createdAt;
-
-    @LastModifiedDate
-    @Column(nullable = false)
-    private Instant updatedAt;
+    private Set<Role> roles = new HashSet<>();
 }

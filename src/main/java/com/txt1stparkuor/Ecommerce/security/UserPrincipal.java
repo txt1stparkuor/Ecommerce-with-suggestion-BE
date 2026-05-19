@@ -16,15 +16,20 @@ import java.util.stream.Collectors;
 public class UserPrincipal implements UserDetails {
 
   private final String id;
-  private final String username;
+  private final String email;
   private final String password;
   private final Collection<? extends GrantedAuthority> authorities;
 
-  private UserPrincipal(String id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
+  private UserPrincipal(String id, String email, String password, Collection<? extends GrantedAuthority> authorities) {
     this.id = id;
-    this.username = username;
+    this.email = email;
     this.password = password;
     this.authorities = authorities;
+  }
+
+  @Override
+  public String getUsername() {
+    return email;
   }
 
   public static UserPrincipal create(User user) {

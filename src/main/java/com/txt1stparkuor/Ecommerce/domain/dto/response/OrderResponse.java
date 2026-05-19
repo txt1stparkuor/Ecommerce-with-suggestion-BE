@@ -1,6 +1,6 @@
 package com.txt1stparkuor.Ecommerce.domain.dto.response;
 
-import com.txt1stparkuor.Ecommerce.domain.entity.OrderStatus;
+import com.txt1stparkuor.Ecommerce.constant.enums.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

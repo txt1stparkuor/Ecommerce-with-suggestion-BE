@@ -1,5 +1,6 @@
 package com.txt1stparkuor.Ecommerce.security;
 
+import com.txt1stparkuor.Ecommerce.constant.UrlConstant;
 import com.txt1stparkuor.Ecommerce.security.jwt.JwtAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,11 +40,6 @@ public class WebSecurityConfig {
 
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-    private final String[] PUBLIC_GET_ENDPOINTS = {"/api/v1/categories/**",
-            "/api/v1/products/**", "/api/v1/reviews/**"};
-
-    private final String[] PUBLIC_POST_ENDPOINTS = {"/api/v1/auth/**",};
-
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -53,8 +49,9 @@ public class WebSecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/api/v1/products/{id}/recommendations/hybrid").authenticated()
-                        .requestMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINTS).permitAll()
-                        .requestMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINTS).permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers(HttpMethod.POST, UrlConstant.PUBLIC_POST_END_POINTS).permitAll()
+                        .requestMatchers(HttpMethod.GET, UrlConstant.PUBLIC_GET_END_POINTS).permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

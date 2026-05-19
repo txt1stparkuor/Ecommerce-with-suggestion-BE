@@ -9,7 +9,7 @@ import com.txt1stparkuor.Ecommerce.domain.dto.response.OrderResponse;
 import java.util.List;
 
 public interface OrderService {
-    OrderResponse createOrder(OrderRequest request);
+    OrderResponse createOrder(String idempotencyKey, OrderRequest request);
 
     List<OrderResponse> getMyOrders();
 

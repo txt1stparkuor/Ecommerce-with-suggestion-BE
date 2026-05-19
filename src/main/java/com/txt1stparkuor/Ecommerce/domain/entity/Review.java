@@ -1,20 +1,17 @@
 package com.txt1stparkuor.Ecommerce.domain.entity;
 
+import com.txt1stparkuor.Ecommerce.domain.entity.common.DateAuditing;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.Instant;
 
 @Entity
 @Table(name = "reviews")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EntityListeners(AuditingEntityListener.class)
-public class Review {
+public class Review extends DateAuditing {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -32,8 +29,4 @@ public class Review {
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
-
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private Instant createdAt;
 }

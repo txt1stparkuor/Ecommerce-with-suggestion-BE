@@ -1,22 +1,21 @@
 package com.txt1stparkuor.Ecommerce.domain.entity;
 
+import com.txt1stparkuor.Ecommerce.constant.enums.OrderStatus;
+import com.txt1stparkuor.Ecommerce.domain.entity.common.DateAuditing;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "orders")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EntityListeners(AuditingEntityListener.class)
-public class Order {
+public class Order extends DateAuditing {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -25,9 +24,8 @@ public class Order {
     @Column(unique = true, nullable = false, updatable = false)
     private String orderCode;
 
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private Instant createdAt;
+    @Column(unique = true, updatable = false)
+    private String idempotencyKey;
 
     private Double totalAmount;
 
@@ -36,16 +34,13 @@ public class Order {
 
     private String shippingAddress;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Builder.Default
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderDetail> orderDetails;
-
-    @LastModifiedDate
-    @Column(nullable = false)
-    private Instant updatedAt;
+    private List<OrderDetail> orderDetails = new ArrayList<>();
 
     @PrePersist
     public void generateOrderCode() {

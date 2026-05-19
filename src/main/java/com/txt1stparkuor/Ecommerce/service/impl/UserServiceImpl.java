@@ -1,13 +1,13 @@
 package com.txt1stparkuor.Ecommerce.service.impl;
 
 import com.txt1stparkuor.Ecommerce.constant.ErrorMessage;
-import com.txt1stparkuor.Ecommerce.constant.SortByDataConstant;
+import com.txt1stparkuor.Ecommerce.constant.enums.SortByDataConstant;
+import com.txt1stparkuor.Ecommerce.domain.dto.pagination.PaginationResponseDto;
 import com.txt1stparkuor.Ecommerce.domain.dto.pagination.PagingMeta;
 import com.txt1stparkuor.Ecommerce.domain.dto.request.RegisterRequest;
 import com.txt1stparkuor.Ecommerce.domain.dto.request.UserCreationRequest;
 import com.txt1stparkuor.Ecommerce.domain.dto.request.UserFilterRequest;
 import com.txt1stparkuor.Ecommerce.domain.dto.request.UserUpdateRequest;
-import com.txt1stparkuor.Ecommerce.domain.dto.pagination.PaginationResponseDto;
 import com.txt1stparkuor.Ecommerce.domain.dto.response.AuthenticationResponse;
 import com.txt1stparkuor.Ecommerce.domain.dto.response.UserResponse;
 import com.txt1stparkuor.Ecommerce.domain.entity.Role;
@@ -138,10 +138,6 @@ public class UserServiceImpl implements UserService {
         }
 
         userMapper.updateUserFromRequest(request, user);
-
-        if (StringUtils.hasText(request.getPassword())) {
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
-        }
 
         if (StringUtils.hasText(request.getRole())) {
             if (!isAdmin) {

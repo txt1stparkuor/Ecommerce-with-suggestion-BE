@@ -4,6 +4,7 @@ import com.txt1stparkuor.Ecommerce.base.RestData;
 import com.txt1stparkuor.Ecommerce.base.VsResponseUtil;
 import com.txt1stparkuor.Ecommerce.constant.ErrorMessage;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -11,6 +12,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
@@ -118,6 +120,19 @@ public class GlobalExceptionHandler {
     public ResponseEntity<RestData<?>> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
         return VsResponseUtil.error(HttpStatus.METHOD_NOT_ALLOWED, ErrorMessage.HTTP_METHOD_NOT_SUPPORTED);
 
+    }
+
+    @ExceptionHandler(OptimisticLockingFailureException.class)
+    public ResponseEntity<RestData<?>> handleOptimisticLockingFailureException(OptimisticLockingFailureException ex) {
+        return VsResponseUtil.error(HttpStatus.CONFLICT, ErrorMessage.OPTIMISTIC_LOCK_ERROR);
+    }
+
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    public ResponseEntity<RestData<?>> handleMissingRequestHeaderException(MissingRequestHeaderException ex) {
+        if (ex.getHeaderName().equals("Idempotency-Key")) {
+            return VsResponseUtil.error(HttpStatus.BAD_REQUEST, ErrorMessage.IDEMPOTENCY_KEY_MISSING);
+        }
+        return VsResponseUtil.error(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
 

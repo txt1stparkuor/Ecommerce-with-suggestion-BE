@@ -18,4 +18,9 @@ public class InvalidException extends RuntimeException {
         this.status = status;
     }
 
+    public InvalidException(String message, String[] params, HttpStatus status) {
+        super(String.format(message, (Object[]) params));
+        this.status=status;
+    }
+
 }
