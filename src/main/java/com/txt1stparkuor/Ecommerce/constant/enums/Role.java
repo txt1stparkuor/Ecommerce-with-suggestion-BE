@@ -1,7 +1,13 @@
 package com.txt1stparkuor.Ecommerce.constant.enums;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
 public enum Role {
-    USER,
-    ADMIN,
-    LEADER
+    USER("ROLE_USER"),
+    ADMIN("ROLE_ADMIN");
+
+    private String displayName;
 }
