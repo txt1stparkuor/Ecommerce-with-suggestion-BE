@@ -38,6 +38,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.txt1stparkuor.Ecommerce.constant.enums.Role.ADMIN;
+import static com.txt1stparkuor.Ecommerce.constant.enums.Role.USER;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -59,7 +62,7 @@ public class UserServiceImpl implements UserService {
             throw new DuplicateResourceException(ErrorMessage.ERR_DUPLICATE, new String[]{"Email", request.getEmail()});
         }
 
-        Role userRole = roleRepository.findByName("ROLE_USER")
+        Role userRole = roleRepository.findByName(USER.name())
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.User.INVALID_ROLE));
 
         User user = User.builder()
@@ -115,8 +118,9 @@ public class UserServiceImpl implements UserService {
     public UserResponse updateUser(String userId, UserUpdateRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUserId = authentication.getName();
+        System.out.println(USER.getDisplayName());
         boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+                .anyMatch(a -> a.getAuthority().equals(ADMIN.getDisplayName()));
 
         if (!isAdmin && !currentUserId.equals(userId)) {
             throw new ForbiddenException(ErrorMessage.FORBIDDEN);
@@ -194,7 +198,7 @@ public class UserServiceImpl implements UserService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUserId = authentication.getName();
         boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+                .anyMatch(a -> a.getAuthority().equals(ADMIN.getDisplayName()));
 
         if (!isAdmin && !currentUserId.equals(userId)) {
             throw new ForbiddenException(ErrorMessage.FORBIDDEN);

@@ -33,6 +33,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.txt1stparkuor.Ecommerce.constant.enums.Role.ADMIN;
+
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
@@ -195,7 +197,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
         boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+                .anyMatch(a -> a.getAuthority().equals(ADMIN.getDisplayName()));
         boolean isOwner = order.getUser().getId().equals(userId);
 
         if (!isAdmin && !isOwner) {
