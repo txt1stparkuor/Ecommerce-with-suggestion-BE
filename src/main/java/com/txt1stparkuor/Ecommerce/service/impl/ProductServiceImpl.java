@@ -2,13 +2,13 @@ package com.txt1stparkuor.Ecommerce.service.impl;
 
 import com.txt1stparkuor.Ecommerce.constant.ErrorMessage;
 import com.txt1stparkuor.Ecommerce.constant.enums.SortByDataConstant;
+import com.txt1stparkuor.Ecommerce.domain.dto.pagination.PaginationResponseDto;
 import com.txt1stparkuor.Ecommerce.domain.dto.pagination.PaginationSortRequestDto;
 import com.txt1stparkuor.Ecommerce.domain.dto.pagination.PagingMeta;
 import com.txt1stparkuor.Ecommerce.domain.dto.request.ProductCreationRequest;
 import com.txt1stparkuor.Ecommerce.domain.dto.request.ProductFilterRequest;
 import com.txt1stparkuor.Ecommerce.domain.dto.request.ProductUpdateRequest;
 import com.txt1stparkuor.Ecommerce.domain.dto.request.ReviewRequest;
-import com.txt1stparkuor.Ecommerce.domain.dto.pagination.PaginationResponseDto;
 import com.txt1stparkuor.Ecommerce.domain.dto.response.ProductResponse;
 import com.txt1stparkuor.Ecommerce.domain.dto.response.ReviewResponse;
 import com.txt1stparkuor.Ecommerce.domain.entity.Category;
@@ -134,6 +134,10 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse createProduct(ProductCreationRequest request, MultipartFile imageFile) {
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+
+        if (request.getPrice() > request.getOriginalPrice()) {
+            throw new InvalidException(ErrorMessage.Product.ERR_INVALID_PRICE);
+        }
 
         if (category.getChildren() != null && !category.getChildren().isEmpty()) {
             throw new InvalidException(ErrorMessage.Product.ERR_CATEGORY_NOT_LEAF);
