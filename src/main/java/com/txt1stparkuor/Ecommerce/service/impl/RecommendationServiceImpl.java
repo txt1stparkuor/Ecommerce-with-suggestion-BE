@@ -26,45 +26,23 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class RecommendationServiceImpl implements RecommendationService {
+
     private final RestTemplate restTemplate;
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
-
     @Value("${python.service.url:http://localhost:8000}")
     private String pythonServiceUrl;
 
     @Override
     public PaginationResponseDto<RecommendedProductDto> getSimilarProducts(String productId, PaginationRequestDto request) {
-        String url = UriComponentsBuilder.fromUriString(pythonServiceUrl + UrlConstant.Recommendation.SIMILAR_PRODUCTS)
+        String url = UriComponentsBuilder.fromUriString(pythonServiceUrl + "/api/recommendations/similar/" + productId)
                 .queryParam("limit", request.getPageSize())
                 .queryParam("page", request.getPageNum() + 1)
-                .buildAndExpand(productId)
                 .toUriString();
 
         try {
             PythonRecommendationResponseDto response = restTemplate.getForObject(url, PythonRecommendationResponseDto.class);
-            if (response == null || response.getData() == null || response.getData().isEmpty()) {
-                return new PaginationResponseDto<>(null, Collections.emptyList());
-            }
-
-            List<RecommendedProductDto> pythonItems = response.getData();
-            List<String> productIds = pythonItems.stream()
-                    .map(RecommendedProductDto::getProductId)
-                    .collect(Collectors.toList());
-
-            Map<String, Product> productDbMap = productRepository.findAllById(productIds)
-                    .stream()
-                    .collect(Collectors.toMap(Product::getId, product -> product));
-
-            List<RecommendedProductDto> finalItems = new ArrayList<>();
-            for (RecommendedProductDto item : pythonItems) {
-                Product dbProduct = productDbMap.get(item.getProductId());
-                if (dbProduct != null) {
-                    productMapper.updateRecommendedProductFromDb(dbProduct, item);
-                    finalItems.add(item);
-                }
-            }
-            return new PaginationResponseDto<>(response.getPagingMeta(), finalItems);
+            return processPythonResponse(response);
         } catch (Exception e) {
             log.error("Failed to fetch similar products from Python service: {}", e.getMessage(), e);
             return new PaginationResponseDto<>(null, Collections.emptyList());
@@ -81,14 +59,11 @@ public class RecommendationServiceImpl implements RecommendationService {
 
         try {
             PythonRecommendationResponseDto response = restTemplate.getForObject(url, PythonRecommendationResponseDto.class);
-            if (response != null && response.getData() != null) {
-                return new PaginationResponseDto<>(response.getPagingMeta(), response.getData());
-            }
+            return processPythonResponse(response);
         } catch (Exception e) {
             log.error("Failed to fetch user recommendations from Python service: {}", e.getMessage(), e);
             return new PaginationResponseDto<>(null, Collections.emptyList());
         }
-        return new PaginationResponseDto<>(null, Collections.emptyList());
     }
 
     @Override
@@ -101,13 +76,36 @@ public class RecommendationServiceImpl implements RecommendationService {
                 .toUriString();
         try {
             PythonRecommendationResponseDto response = restTemplate.getForObject(url, PythonRecommendationResponseDto.class);
-            if (response != null && response.getData() != null) {
-                return new PaginationResponseDto<>(response.getPagingMeta(), response.getData());
-            }
+            return processPythonResponse(response);
+
         } catch (Exception e) {
             log.error("Failed to fetch hybrid products recommendations from Python service: {}", e.getMessage(), e);
             return new PaginationResponseDto<>(null, Collections.emptyList());
         }
-        return new PaginationResponseDto<>(null, Collections.emptyList());
+    }
+
+    private PaginationResponseDto<RecommendedProductDto> processPythonResponse(PythonRecommendationResponseDto response) {
+        if (response == null || response.getData() == null || response.getData().isEmpty()) {
+            return new PaginationResponseDto<>(null, Collections.emptyList());
+        }
+
+        List<RecommendedProductDto> pythonItems = response.getData();
+        List<String> productIds = pythonItems.stream()
+                .map(RecommendedProductDto::getProductId)
+                .collect(Collectors.toList());
+        Map<String, Product> productDbMap = productRepository.findAllById(productIds)
+                .stream()
+                .collect(Collectors.toMap(Product::getId, product -> product));
+
+        List<RecommendedProductDto> finalItems = new ArrayList<>();
+        for (RecommendedProductDto item : pythonItems) {
+            Product dbProduct = productDbMap.get(item.getProductId());
+            if (dbProduct != null) {
+                productMapper.updateRecommendedProductFromDb(dbProduct, item);
+                finalItems.add(item);
+            }
+        }
+
+        return new PaginationResponseDto<>(response.getPagingMeta(), finalItems);
     }
 }
