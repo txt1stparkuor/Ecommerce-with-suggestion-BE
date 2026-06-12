@@ -68,6 +68,7 @@ public class ErrorMessage {
         public static final String ERR_NOT_ENOUGH_STOCK = "Product %s does not have enough stock.";
         public static final String ERR_INVALID_PRICE_RANGE = "Minimum price cannot be greater than maximum price.";
         public static final String ERR_CATEGORY_NOT_LEAF = "Product can only be assigned to a leaf category (a category with no children).";
+        public static final String ERR_INVALID_PRICE= "Original price must be greater than or equal to price";
     }
 
     public static class Cart {

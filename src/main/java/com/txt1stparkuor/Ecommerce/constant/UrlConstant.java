@@ -105,6 +105,14 @@ public class UrlConstant {
         }
     }
 
+    public static class Recommendation {
+        private static final String PRE_FIX = "/api/recommendations";
+        public static final String SIMILAR_PRODUCTS = PRE_FIX + "/similar/{productId}";
+        public static final String PRODUCTS_FOR_USER = PRE_FIX + "/user/{userId}";
+        public static final String HYBRID = PRE_FIX + "/hybrid/{userId}";
+        private Recommendation() {}
+    }
+
     public static final String[] PUBLIC_POST_END_POINTS = {
             BASE_URL + Auth.LOGIN,
             BASE_URL + Auth.REGISTER,
