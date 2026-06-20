@@ -118,7 +118,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse updateUser(String userId, UserUpdateRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUserId = authentication.getName();
-        System.out.println(USER.getDisplayName());
+
         boolean isAdmin = authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals(ADMIN.getDisplayName()));
 
