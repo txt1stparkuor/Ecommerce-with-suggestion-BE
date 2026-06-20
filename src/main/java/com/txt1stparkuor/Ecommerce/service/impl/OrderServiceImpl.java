@@ -24,7 +24,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -85,8 +84,7 @@ public class OrderServiceImpl implements OrderService {
         for (CartItem cartItem : itemsToOrder) {
             Product product = cartItem.getProduct();
             if (product.getStockQuantity() < cartItem.getQuantity()) {
-                throw new InvalidException(ErrorMessage.Product.ERR_NOT_ENOUGH_STOCK,
-                        new String[]{product.getName()}, HttpStatus.CONFLICT);
+                throw new InvalidException(ErrorMessage.Order.ERR_NOT_ENOUGH_STOCK_FOR_ORDER);
             }
             product.setStockQuantity(product.getStockQuantity() - cartItem.getQuantity());
             productRepository.save(product);
