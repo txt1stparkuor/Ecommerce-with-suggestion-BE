@@ -1,6 +1,7 @@
 package com.txt1stparkuor.Ecommerce.service;
 
 import com.txt1stparkuor.Ecommerce.domain.dto.pagination.PaginationResponseDto;
+import com.txt1stparkuor.Ecommerce.domain.dto.pagination.PaginationSortRequestDto;
 import com.txt1stparkuor.Ecommerce.domain.dto.request.OrderFilterRequest;
 import com.txt1stparkuor.Ecommerce.domain.dto.request.OrderRequest;
 import com.txt1stparkuor.Ecommerce.domain.dto.request.UpdateOrderStatusRequest;
@@ -11,7 +12,7 @@ import java.util.List;
 public interface OrderService {
     OrderResponse createOrder(String idempotencyKey, OrderRequest request);
 
-    List<OrderResponse> getMyOrders();
+    List<OrderResponse> getMyOrders(PaginationSortRequestDto request);
 
     PaginationResponseDto<OrderResponse> getAllOrders(OrderFilterRequest filterDto);
 

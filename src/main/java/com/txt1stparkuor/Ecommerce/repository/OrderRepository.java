@@ -1,6 +1,7 @@
 package com.txt1stparkuor.Ecommerce.repository;
 
 import com.txt1stparkuor.Ecommerce.domain.entity.Order;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
@@ -10,6 +11,6 @@ import java.util.Optional;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, String>, JpaSpecificationExecutor<Order> {
-    List<Order> findByUserId(String userId);
+    List<Order> findByUserId(String userId, Sort sort);
     Optional<Order> findByIdempotencyKeyAndUserId(String idempotencyKey, String userId);
 }

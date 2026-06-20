@@ -18,7 +18,7 @@ public enum SortByDataConstant {
             Set.of("createdAt", "rating")
     ),
     ORDER(
-            Set.of("createdAt", "totalAmount")
+            Set.of("createdAt", "totalAmount"), "createdAt"
     ),
     CATEGORY(
             Set.of("name")
