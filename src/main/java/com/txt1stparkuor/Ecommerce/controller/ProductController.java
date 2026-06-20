@@ -24,7 +24,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -191,7 +190,6 @@ public class ProductController {
     })
     @GetMapping(UrlConstant.Product.PRODUCT_RECOMMENDATIONS_HYBRID)
     public ResponseEntity<?> getHybridProductsRecommendations(@PathVariable String id, @Valid PaginationRequestDto request) {
-        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
-        return VsResponseUtil.success(recommendationService.getHybridProductsRecommendations(id, userId, request));
+        return VsResponseUtil.success(recommendationService.getHybridProductsRecommendations(id, request));
     }
 }

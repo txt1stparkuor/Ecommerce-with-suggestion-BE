@@ -20,8 +20,6 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestApiV1
@@ -140,8 +138,6 @@ public class UserController {
     })
     @GetMapping(UrlConstant.User.USER_RECOMMENDATIONS)
     public ResponseEntity<?> getUserRecommendations(@Valid PaginationRequestDto request) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userId = authentication.getName();
-        return VsResponseUtil.success(recommendationService.getUserRecommendations(userId, request));
+        return VsResponseUtil.success(recommendationService.getUserRecommendations(request));
     }
 }

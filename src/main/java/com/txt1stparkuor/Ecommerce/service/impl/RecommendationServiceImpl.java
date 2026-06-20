@@ -12,6 +12,8 @@ import com.txt1stparkuor.Ecommerce.service.RecommendationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -50,7 +52,9 @@ public class RecommendationServiceImpl implements RecommendationService {
     }
 
     @Override
-    public PaginationResponseDto<RecommendedProductDto> getUserRecommendations(String userId, PaginationRequestDto request) {
+    public PaginationResponseDto<RecommendedProductDto> getUserRecommendations(PaginationRequestDto request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = authentication.getName();
         String url = UriComponentsBuilder.fromUriString(pythonServiceUrl + UrlConstant.Recommendation.PRODUCTS_FOR_USER)
                 .queryParam("limit", request.getPageSize())
                 .queryParam("page", request.getPageNum() + 1)
@@ -67,7 +71,8 @@ public class RecommendationServiceImpl implements RecommendationService {
     }
 
     @Override
-    public PaginationResponseDto<RecommendedProductDto> getHybridProductsRecommendations(String productId, String userId, PaginationRequestDto request) {
+    public PaginationResponseDto<RecommendedProductDto> getHybridProductsRecommendations(String productId, PaginationRequestDto request) {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
         String url = UriComponentsBuilder.fromUriString(pythonServiceUrl + UrlConstant.Recommendation.HYBRID)
                 .queryParam("limit", request.getPageSize())
                 .queryParam("page", request.getPageNum() + 1)
