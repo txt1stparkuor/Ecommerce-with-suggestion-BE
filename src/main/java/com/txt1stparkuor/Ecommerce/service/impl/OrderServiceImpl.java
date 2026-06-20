@@ -4,6 +4,7 @@ import com.txt1stparkuor.Ecommerce.constant.ErrorMessage;
 import com.txt1stparkuor.Ecommerce.constant.enums.OrderStatus;
 import com.txt1stparkuor.Ecommerce.constant.enums.SortByDataConstant;
 import com.txt1stparkuor.Ecommerce.domain.dto.pagination.PaginationResponseDto;
+import com.txt1stparkuor.Ecommerce.domain.dto.pagination.PaginationSortRequestDto;
 import com.txt1stparkuor.Ecommerce.domain.dto.pagination.PagingMeta;
 import com.txt1stparkuor.Ecommerce.domain.dto.request.OrderFilterRequest;
 import com.txt1stparkuor.Ecommerce.domain.dto.request.OrderRequest;
@@ -23,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -120,11 +122,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<OrderResponse> getMyOrders() {
+    public List<OrderResponse> getMyOrders(PaginationSortRequestDto request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
-
-        List<Order> orders = orderRepository.findByUserId(userId);
+        Sort sort = PaginationUtil.buildSort(request, SortByDataConstant.ORDER);
+        List<Order> orders = orderRepository.findByUserId(userId, sort);
         return orderMapper.toListOrderResponse(orders);
     }
 

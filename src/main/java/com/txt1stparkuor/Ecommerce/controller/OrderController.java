@@ -4,6 +4,7 @@ import com.txt1stparkuor.Ecommerce.annotation.ApiCommonResponses;
 import com.txt1stparkuor.Ecommerce.base.RestApiV1;
 import com.txt1stparkuor.Ecommerce.base.VsResponseUtil;
 import com.txt1stparkuor.Ecommerce.constant.UrlConstant;
+import com.txt1stparkuor.Ecommerce.domain.dto.pagination.PaginationSortRequestDto;
 import com.txt1stparkuor.Ecommerce.domain.dto.request.OrderFilterRequest;
 import com.txt1stparkuor.Ecommerce.domain.dto.request.OrderRequest;
 import com.txt1stparkuor.Ecommerce.domain.dto.request.UpdateOrderStatusRequest;
@@ -54,8 +55,8 @@ public class OrderController {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved user's orders")
     })
     @GetMapping(UrlConstant.Order.GET_MY_ORDERS)
-    public ResponseEntity<?> getMyOrders() {
-        return VsResponseUtil.success(orderService.getMyOrders());
+    public ResponseEntity<?> getMyOrders(@ModelAttribute PaginationSortRequestDto request) {
+        return VsResponseUtil.success(orderService.getMyOrders(request));
     }
 
     @Operation(
