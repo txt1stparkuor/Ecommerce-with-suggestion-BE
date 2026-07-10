@@ -3,6 +3,7 @@ package com.txt1stparkuor.Ecommerce.domain.entity;
 import com.txt1stparkuor.Ecommerce.domain.entity.common.DateAuditing;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,6 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@BatchSize(size = 30)
 public class Category extends DateAuditing {
 
     @Id
