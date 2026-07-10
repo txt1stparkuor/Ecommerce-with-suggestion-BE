@@ -37,11 +37,11 @@ public class RecommendationServiceImpl implements RecommendationService {
 
     @Override
     public PaginationResponseDto<RecommendedProductDto> getSimilarProducts(String productId, PaginationRequestDto request) {
-        String url = UriComponentsBuilder.fromUriString(pythonServiceUrl + "/api/recommendations/similar/" + productId)
+        String url = UriComponentsBuilder.fromUriString(pythonServiceUrl + UrlConstant.Recommendation.SIMILAR_PRODUCTS)
                 .queryParam("limit", request.getPageSize())
                 .queryParam("page", request.getPageNum() + 1)
+                .buildAndExpand(productId)
                 .toUriString();
-
         try {
             PythonRecommendationResponseDto response = restTemplate.getForObject(url, PythonRecommendationResponseDto.class);
             return processPythonResponse(response);
