@@ -1,5 +1,6 @@
 package com.txt1stparkuor.Ecommerce.service.impl;
 
+import com.txt1stparkuor.Ecommerce.constant.CacheName;
 import com.txt1stparkuor.Ecommerce.constant.ErrorMessage;
 import com.txt1stparkuor.Ecommerce.constant.enums.OrderStatus;
 import com.txt1stparkuor.Ecommerce.constant.enums.SortByDataConstant;
@@ -17,10 +18,13 @@ import com.txt1stparkuor.Ecommerce.exception.NotFoundException;
 import com.txt1stparkuor.Ecommerce.repository.CartRepository;
 import com.txt1stparkuor.Ecommerce.repository.OrderRepository;
 import com.txt1stparkuor.Ecommerce.repository.ProductRepository;
+import com.txt1stparkuor.Ecommerce.service.OrderRecoveryService;
 import com.txt1stparkuor.Ecommerce.service.OrderService;
 import com.txt1stparkuor.Ecommerce.service.specification.OrderSpecification;
 import com.txt1stparkuor.Ecommerce.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,8 +32,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -43,8 +49,10 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
+    private final CacheManager cacheManager;
     private final OrderMapper orderMapper;
     private final OrderSpecification orderSpecification;
+    private final OrderRecoveryService orderRecoveryService;
 
     @Override
     @Transactional
@@ -90,6 +98,12 @@ public class OrderServiceImpl implements OrderService {
             }
             product.setStockQuantity(product.getStockQuantity() - cartItem.getQuantity());
             productRepository.save(product);
+            if (cacheManager.getCache(CacheName.PRODUCT) != null) {
+                cacheManager.getCache(CacheName.PRODUCT).evict(product.getId());
+            }
+            if (cacheManager.getCache(CacheName.SIMILAR_PRODUCTS) != null) {
+                cacheManager.getCache(CacheName.SIMILAR_PRODUCTS).clear();
+            }
 
             OrderDetail orderDetail = OrderDetail.builder()
                     .order(order)
@@ -106,14 +120,13 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderDetails(orderDetails);
 
         try {
-            orderRepository.save(order);
-
-        } catch (DataIntegrityViolationException e) {
-            Order recoveredOrder = orderRepository.findByIdempotencyKeyAndUserId(idempotencyKey, userId)
-                    .orElseThrow(() -> new NotFoundException(ErrorMessage.Order.ERR_RECOVER_IDEMPOTENT));
+            orderRepository.saveAndFlush(order);
+        } catch (DataIntegrityViolationException | CannotAcquireLockException e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            Order recoveredOrder = orderRecoveryService.recoverByIdempotencyKey(idempotencyKey, userId);
             return orderMapper.toOrderResponse(recoveredOrder);
         }
-        
+
         cart.getCartItems().removeAll(itemsToOrder);
         cartRepository.save(cart);
 
@@ -175,12 +188,18 @@ public class OrderServiceImpl implements OrderService {
         }
 
         order.setStatus(OrderStatus.CANCELLED);
-        
+
         // Restore stock
         for (OrderDetail detail : order.getOrderDetails()) {
             Product product = detail.getProduct();
             product.setStockQuantity(product.getStockQuantity() + detail.getQuantity());
             productRepository.save(product);
+            if (cacheManager.getCache(CacheName.PRODUCT) != null) {
+                cacheManager.getCache(CacheName.PRODUCT).evict(product.getId());
+            }
+            if (cacheManager.getCache(CacheName.SIMILAR_PRODUCTS) != null) {
+                cacheManager.getCache(CacheName.SIMILAR_PRODUCTS).clear();
+            }
         }
 
         orderRepository.save(order);

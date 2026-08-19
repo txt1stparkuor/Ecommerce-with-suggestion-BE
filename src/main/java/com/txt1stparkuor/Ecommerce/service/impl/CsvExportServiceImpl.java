@@ -1,11 +1,14 @@
 package com.txt1stparkuor.Ecommerce.service.impl;
 
+import com.txt1stparkuor.Ecommerce.constant.CacheName;
 import com.txt1stparkuor.Ecommerce.domain.entity.Product;
 import com.txt1stparkuor.Ecommerce.repository.ProductRepository;
 import com.txt1stparkuor.Ecommerce.service.CsvExportService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +27,9 @@ public class CsvExportServiceImpl implements CsvExportService {
 
     @Override
     @Transactional(readOnly = true)
+    @Caching(evict = {
+            @CacheEvict(value = CacheName.SIMILAR_PRODUCTS, allEntries = true)
+    })
     public ByteArrayInputStream generateAmazonCsv() {
         final String[] headers = {
                 "product_id", "product_name", "category", "discounted_price", "actual_price",
