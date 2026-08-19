@@ -1,5 +1,6 @@
 package com.txt1stparkuor.Ecommerce.service.impl;
 
+import com.txt1stparkuor.Ecommerce.constant.CacheName;
 import com.txt1stparkuor.Ecommerce.constant.ErrorMessage;
 import com.txt1stparkuor.Ecommerce.constant.enums.SortByDataConstant;
 import com.txt1stparkuor.Ecommerce.domain.dto.pagination.PaginationResponseDto;
@@ -33,6 +34,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -73,6 +77,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = CacheName.PRODUCT, key = "#id")
     public ProductResponse getProductById(String id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
@@ -97,6 +102,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = CacheName.PRODUCT, key = "#productId"),
+            @CacheEvict(value = CacheName.SIMILAR_PRODUCTS, allEntries = true)
+    })
     public ReviewResponse createReview(String productId, ReviewRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
@@ -131,6 +140,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
+    @CacheEvict(value = CacheName.SIMILAR_PRODUCTS, allEntries = true)
     public ProductResponse createProduct(ProductCreationRequest request, MultipartFile imageFile) {
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
@@ -158,6 +168,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = CacheName.PRODUCT, key = "#id"),
+            @CacheEvict(value = CacheName.SIMILAR_PRODUCTS, allEntries = true)
+    })
     public ProductResponse updateProduct(String id, ProductUpdateRequest request, MultipartFile imageFile) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
@@ -189,6 +203,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = CacheName.PRODUCT, key = "#id"),
+            @CacheEvict(value = CacheName.SIMILAR_PRODUCTS, allEntries = true)
+    })
     public void deleteProduct(String id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));

@@ -1,5 +1,6 @@
 package com.txt1stparkuor.Ecommerce.service.impl;
 
+import com.txt1stparkuor.Ecommerce.constant.CacheName;
 import com.txt1stparkuor.Ecommerce.constant.UrlConstant;
 import com.txt1stparkuor.Ecommerce.domain.dto.pagination.PaginationRequestDto;
 import com.txt1stparkuor.Ecommerce.domain.dto.pagination.PaginationResponseDto;
@@ -14,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -36,6 +39,7 @@ public class RecommendationServiceImpl implements RecommendationService {
     private String pythonServiceUrl;
 
     @Override
+    @Cacheable(value = CacheName.SIMILAR_PRODUCTS, key = "#productId + '_' + #request.pageNum + '_' + #request.pageSize")
     public PaginationResponseDto<RecommendedProductDto> getSimilarProducts(String productId, PaginationRequestDto request) {
         String url = UriComponentsBuilder.fromUriString(pythonServiceUrl + UrlConstant.Recommendation.SIMILAR_PRODUCTS)
                 .queryParam("limit", request.getPageSize())
