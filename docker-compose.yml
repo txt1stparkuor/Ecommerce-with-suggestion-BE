@@ -21,6 +21,16 @@ services:
       retries: 5
       start_period: 10s
 
+  # Redis Service
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis-data:/data
+
   # Spring Boot Application Service
   spring-app:
     build: .
@@ -28,18 +38,35 @@ services:
     ports:
       - "${SPRING_LOCAL_PORT}:8080"
     environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      # Database
       DB_HOST: mysql-db
       DB_PORT: 3306
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+      # Cloudinary
       CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
       CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
       CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+      # JWT
       JWT_SECRET: ${JWT_SECRET}
+      # Mail
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      # Redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      # App
+      FRONTEND_URL: ${FRONTEND_URL}
+      PYTHON_API_URL: ${PYTHON_API_URL}
     depends_on:
       mysql-db:
         condition: service_healthy
+      redis:
+        condition: service_started
 
 volumes:
   mysql-data:
+  redis-data:
