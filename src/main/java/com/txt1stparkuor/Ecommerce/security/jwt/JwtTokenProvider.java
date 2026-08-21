@@ -25,10 +25,10 @@ public class JwtTokenProvider {
     @Value("${jwt.secret:0093e0fac86980c2c30d8fe89047371c5e7845d6ebe5f025a81d5a745c5f8b10}")
     private String SECRET_KEY;
 
-    @Value("${jwt.access.expiration_time}")
+    @Value("${jwt.access.expiration_time:30}")
     private Integer EXPIRATION_TIME_ACCESS_TOKEN_MINUTES;
 
-    @Value("${jwt.refresh.expiration_time}")
+    @Value("${jwt.refresh.expiration_time:4320}")
     private Integer EXPIRATION_TIME_REFRESH_TOKEN_MINUTES;
 
     public String generateToken(UserPrincipal userPrincipal, boolean isRefreshToken) {
