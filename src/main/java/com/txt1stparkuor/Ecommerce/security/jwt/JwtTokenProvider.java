@@ -22,7 +22,7 @@ import java.util.UUID;
 @Component
 public class JwtTokenProvider {
 
-    @Value("${jwt.secret:0093e0fac86980c2c30d8fe89047371c5e7845d6ebe5f025a81d5a745c5f8b10}")
+    @Value("${jwt.secret}")
     private String SECRET_KEY;
 
     @Value("${jwt.access.expiration_time:30}")
