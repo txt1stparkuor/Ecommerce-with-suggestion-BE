@@ -39,7 +39,11 @@ public class RecommendationServiceImpl implements RecommendationService {
     private String pythonServiceUrl;
 
     @Override
-    @Cacheable(value = CacheName.SIMILAR_PRODUCTS, key = "#productId + '_' + #request.pageNum + '_' + #request.pageSize")
+    @Cacheable(
+        value = CacheName.SIMILAR_PRODUCTS,
+        key = "#productId + '_' + #request.pageNum + '_' + #request.pageSize",
+        unless = "#result == null || #result.items == null || #result.items.isEmpty()"
+    )
     public PaginationResponseDto<RecommendedProductDto> getSimilarProducts(String productId, PaginationRequestDto request) {
         String url = UriComponentsBuilder.fromUriString(pythonServiceUrl + UrlConstant.Recommendation.SIMILAR_PRODUCTS)
                 .queryParam("limit", request.getPageSize())
