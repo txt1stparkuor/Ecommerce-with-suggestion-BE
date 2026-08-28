@@ -22,10 +22,6 @@ public class UrlConstant {
         public static final String USER_COMMON = PRE_FIX;
         public static final String USER_ID = PRE_FIX + "/{id}";
         public static final String GET_CURRENT_USER = PRE_FIX + "/me";
-        public static final String GET_MY_CLASSROOMS = GET_CURRENT_USER + "/classrooms";
-        public static final String GET_MY_COMPETITIONS = GET_CURRENT_USER + "/competitions";
-        public static final String GET_CLASS_USER = USER_ID + "/classrooms";
-        public static final String GET_MY_POSTS = GET_CURRENT_USER + "/posts";
         public static final String RESET_USERS = PRE_FIX + "/reset";
         public static final String USER_RECOMMENDATIONS = PRE_FIX + "/recommendations";
 
@@ -103,6 +99,14 @@ public class UrlConstant {
 
         private Export() {
         }
+    }
+
+    public static class Recommendation {
+        private static final String PRE_FIX = "/api/recommendations";
+        public static final String SIMILAR_PRODUCTS = PRE_FIX + "/similar/{productId}";
+        public static final String PRODUCTS_FOR_USER = PRE_FIX + "/user/{userId}";
+        public static final String HYBRID = PRE_FIX + "/hybrid/{userId}";
+        private Recommendation() {}
     }
 
     public static final String[] PUBLIC_POST_END_POINTS = {

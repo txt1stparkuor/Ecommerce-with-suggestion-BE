@@ -44,10 +44,6 @@ public class CartServiceImpl implements CartService {
         Product product = productRepository.findById(request.getProductId())
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
 
-        if (product.getStockQuantity() < request.getQuantity()) {
-            throw new InvalidException(ErrorMessage.Product.ERR_NOT_ENOUGH_STOCK);
-        }
-
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseGet(() -> {
                     User user = userRepository.findById(userId)
@@ -63,9 +59,16 @@ public class CartServiceImpl implements CartService {
                 .filter(item -> item.getProduct().getId().equals(product.getId()))
                 .findFirst();
 
+        int currentCartQuantity = existingItem.map(CartItem::getQuantity).orElse(0);
+        int targetQuantity = currentCartQuantity + request.getQuantity();
+
+        if (product.getStockQuantity() < targetQuantity) {
+            throw new InvalidException(ErrorMessage.Cart.ERR_NOT_ENOUGH_STOCK);
+        }
+
         if (existingItem.isPresent()) {
             CartItem item = existingItem.get();
-            item.setQuantity(item.getQuantity() + request.getQuantity());
+            item.setQuantity(targetQuantity);
             cartItemRepository.save(item);
         } else {
             CartItem newItem = CartItem.builder()
@@ -106,7 +109,7 @@ public class CartServiceImpl implements CartService {
         }
 
         if (cartItem.getProduct().getStockQuantity() < request.getQuantity()) {
-            throw new InvalidException(ErrorMessage.Product.ERR_NOT_ENOUGH_STOCK);
+            throw new InvalidException(ErrorMessage.Cart.ERR_UPDATED_CART_ITEM_QUANTITY);
         }
 
         cartItem.setQuantity(request.getQuantity());

@@ -65,19 +65,23 @@ public class ErrorMessage {
     }
 
     public static class Product {
-        public static final String ERR_NOT_ENOUGH_STOCK = "Product %s does not have enough stock.";
+        public static final String ERR_NOT_ENOUGH_STOCK = "Product does not have enough stock.";
         public static final String ERR_INVALID_PRICE_RANGE = "Minimum price cannot be greater than maximum price.";
         public static final String ERR_CATEGORY_NOT_LEAF = "Product can only be assigned to a leaf category (a category with no children).";
+        public static final String ERR_INVALID_PRICE= "Original price must be greater than or equal to price";
     }
 
     public static class Cart {
         public static final String ERR_CART_EMPTY = "Cart is empty";
+        public static final String ERR_NOT_ENOUGH_STOCK = "Product does not have enough stock to add more to cart";
         public static final String ERR_ITEM_NOT_IN_CART = "One or more items not found in cart";
+        public static final String ERR_UPDATED_CART_ITEM_QUANTITY = "The updated product does not have enough stock";
     }
 
     public static class Order {
         public static final String ERR_CANCEL_ORDER = "Order cannot be cancelled in its current state.";
         public static final String ERR_RECOVER_IDEMPOTENT = "Error recovering idempotent order";
+        public static final String ERR_NOT_ENOUGH_STOCK_FOR_ORDER = "One or more products do not have enough stock for this order.";
     }
 
     public static class PasswordResetToken {
