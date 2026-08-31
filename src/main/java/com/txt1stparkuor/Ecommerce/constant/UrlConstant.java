@@ -109,6 +109,14 @@ public class UrlConstant {
         private Recommendation() {}
     }
 
+    public static class Health {
+        private static final String PRE_FIX = "/health";
+        public static final String HEALTH_COMMON = PRE_FIX;
+
+        private Health() {
+        }
+    }
+
     public static final String[] PUBLIC_POST_END_POINTS = {
             BASE_URL + Auth.LOGIN,
             BASE_URL + Auth.REGISTER,
@@ -120,6 +128,7 @@ public class UrlConstant {
     public static final String[] PUBLIC_GET_END_POINTS = {
             BASE_URL + Category.CATEGORY_COMMON + "/**",
             BASE_URL + Product.PRODUCT_COMMON + "/**",
-            BASE_URL + Review.PRE_FIX + "/**"
+            BASE_URL + Review.PRE_FIX + "/**",
+            BASE_URL + Health.HEALTH_COMMON
     };
 }
