@@ -23,20 +23,24 @@ import com.txt1stparkuor.Ecommerce.service.OrderService;
 import com.txt1stparkuor.Ecommerce.service.specification.OrderSpecification;
 import com.txt1stparkuor.Ecommerce.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
-
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -44,6 +48,7 @@ import static com.txt1stparkuor.Ecommerce.constant.enums.Role.ADMIN;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
@@ -59,6 +64,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponse createOrder(String idempotencyKey, OrderRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
+
         Optional<Order> existingOrder = orderRepository.findByIdempotencyKeyAndUserId(idempotencyKey, userId);
         if (existingOrder.isPresent()) {
             return orderMapper.toOrderResponse(existingOrder.get());
@@ -71,7 +77,12 @@ public class OrderServiceImpl implements OrderService {
             throw new InvalidException(ErrorMessage.Cart.ERR_CART_EMPTY);
         }
 
-        Set<String> requestedItemIds = Set.copyOf(request.getCartItemIds());
+        List<String> cartItemIds = request.getCartItemIds();
+        Set<String> requestedItemIds = new HashSet<>(cartItemIds);
+        if (requestedItemIds.size() != cartItemIds.size()) {
+            throw new InvalidException(ErrorMessage.Cart.ERR_DUPLICATE_CART_ITEMS);
+        }
+
         List<CartItem> itemsToOrder = cart.getCartItems().stream()
                 .filter(item -> requestedItemIds.contains(item.getId()))
                 .sorted(Comparator.comparing(item -> item.getProduct().getId()))
@@ -81,9 +92,6 @@ public class OrderServiceImpl implements OrderService {
             throw new InvalidException(ErrorMessage.Cart.ERR_ITEM_NOT_IN_CART);
         }
 
-        double totalAmount = 0;
-        List<OrderDetail> orderDetails = new ArrayList<>();
-
         Order order = Order.builder()
                 .user(cart.getUser())
                 .shippingAddress(request.getShippingAddress())
@@ -91,46 +99,61 @@ public class OrderServiceImpl implements OrderService {
                 .idempotencyKey(idempotencyKey)
                 .build();
 
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        List<OrderDetail> orderDetails = new ArrayList<>();
+        List<Product> updatedProducts = new ArrayList<>();
+
         for (CartItem cartItem : itemsToOrder) {
             Product product = cartItem.getProduct();
+
             if (product.getStockQuantity() < cartItem.getQuantity()) {
-                throw new InvalidException(ErrorMessage.Order.ERR_NOT_ENOUGH_STOCK_FOR_ORDER);
+                throw new InvalidException(ErrorMessage.Product.ERR_NOT_ENOUGH_STOCK);
             }
             product.setStockQuantity(product.getStockQuantity() - cartItem.getQuantity());
-            productRepository.save(product);
-            if (cacheManager.getCache(CacheName.PRODUCT) != null) {
-                cacheManager.getCache(CacheName.PRODUCT).evict(product.getId());
-            }
-            if (cacheManager.getCache(CacheName.SIMILAR_PRODUCTS) != null) {
-                cacheManager.getCache(CacheName.SIMILAR_PRODUCTS).clear();
-            }
+            updatedProducts.add(product);
 
-            OrderDetail orderDetail = OrderDetail.builder()
+            totalAmount = totalAmount.add(
+                    BigDecimal.valueOf(product.getPrice())
+                            .multiply(BigDecimal.valueOf(cartItem.getQuantity())));
+
+            orderDetails.add(OrderDetail.builder()
                     .order(order)
                     .product(product)
                     .quantity(cartItem.getQuantity())
                     .price(product.getPrice())
-                    .build();
-
-            orderDetails.add(orderDetail);
-            totalAmount += product.getPrice() * cartItem.getQuantity();
+                    .build());
         }
 
-        order.setTotalAmount(totalAmount);
+        order.setTotalAmount(totalAmount.setScale(2, RoundingMode.HALF_UP).doubleValue());
         order.setOrderDetails(orderDetails);
 
         try {
+            productRepository.saveAll(updatedProducts);
             orderRepository.saveAndFlush(order);
         } catch (DataIntegrityViolationException | CannotAcquireLockException e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            Order recoveredOrder = orderRecoveryService.recoverByIdempotencyKey(idempotencyKey, userId);
-            return orderMapper.toOrderResponse(recoveredOrder);
+            return orderMapper.toOrderResponse(
+                    orderRecoveryService.recoverByIdempotencyKey(idempotencyKey, userId));
+        } catch (OptimisticLockingFailureException e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            throw new InvalidException(ErrorMessage.Order.ERR_NOT_ENOUGH_STOCK_FOR_ORDER);
         }
 
+        evictProductCaches(updatedProducts.stream().map(Product::getId).toList());
         cart.getCartItems().removeAll(itemsToOrder);
-        cartRepository.save(cart);
 
         return orderMapper.toOrderResponse(order);
+    }
+
+    private void evictProductCaches(List<String> productIds) {
+        Cache productCache = cacheManager.getCache(CacheName.PRODUCT);
+        if (productCache != null) {
+            productIds.forEach(productCache::evict);
+        }
+        Cache similarCache = cacheManager.getCache(CacheName.SIMILAR_PRODUCTS);
+        if (similarCache != null) {
+            similarCache.clear();
+        }
     }
 
     @Override
@@ -190,17 +213,15 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(OrderStatus.CANCELLED);
 
         // Restore stock
+        List<String> updatedProductIds = new ArrayList<>();
         for (OrderDetail detail : order.getOrderDetails()) {
             Product product = detail.getProduct();
             product.setStockQuantity(product.getStockQuantity() + detail.getQuantity());
             productRepository.save(product);
-            if (cacheManager.getCache(CacheName.PRODUCT) != null) {
-                cacheManager.getCache(CacheName.PRODUCT).evict(product.getId());
-            }
-            if (cacheManager.getCache(CacheName.SIMILAR_PRODUCTS) != null) {
-                cacheManager.getCache(CacheName.SIMILAR_PRODUCTS).clear();
-            }
+            updatedProductIds.add(product.getId());
         }
+
+        evictProductCaches(updatedProductIds);
 
         orderRepository.save(order);
 
