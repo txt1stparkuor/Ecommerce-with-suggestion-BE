@@ -1,5 +1,6 @@
 package com.txt1stparkuor.Ecommerce.service.impl;
 
+import com.txt1stparkuor.Ecommerce.constant.CacheName;
 import com.txt1stparkuor.Ecommerce.domain.dto.request.CategoryFilterRequest;
 import com.txt1stparkuor.Ecommerce.domain.dto.response.CategoryResponse;
 import com.txt1stparkuor.Ecommerce.domain.entity.Category;
@@ -8,6 +9,7 @@ import com.txt1stparkuor.Ecommerce.repository.CategoryRepository;
 import com.txt1stparkuor.Ecommerce.service.CategoryService;
 import com.txt1stparkuor.Ecommerce.service.specification.CategorySpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +27,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<CategoryResponse> getAllCategories() {
+    @Cacheable(value = CacheName.CATEGORIES, key = "#root.methodName", unless = "#result == null || #result.isEmpty()")
+    public List<CategoryResponse> getAllBaseCategories() {
         return categoryMapper.toListCategoryResponse(categoryRepository.findByParentIsNull());
     }
 
