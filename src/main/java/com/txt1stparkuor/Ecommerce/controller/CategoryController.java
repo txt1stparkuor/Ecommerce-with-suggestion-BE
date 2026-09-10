@@ -35,8 +35,8 @@ public class CategoryController {
     })
     @SecurityRequirements()
     @GetMapping(UrlConstant.Category.CATEGORY_COMMON)
-    public ResponseEntity<?> getAllCategories() {
-        return VsResponseUtil.success(categoryService.getAllCategories());
+    public ResponseEntity<?> getAllBaseCategories() {
+        return VsResponseUtil.success(categoryService.getAllBaseCategories());
     }
 
     @Operation(
