@@ -187,7 +187,34 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
 
-        order.setStatus(request.getStatus());
+        OrderStatus currentStatus = order.getStatus();
+        OrderStatus newStatus = request.getStatus();
+
+        if (currentStatus == newStatus) {
+            throw new InvalidException(String.format(ErrorMessage.Order.ERR_ORDER_SAME_STATUS, currentStatus));
+        }
+
+        if (currentStatus == OrderStatus.CANCELLED) {
+            throw new InvalidException(ErrorMessage.Order.ERR_ORDER_ALREADY_CANCELLED);
+        }
+
+        if (currentStatus == OrderStatus.DELIVERED) {
+            throw new InvalidException(ErrorMessage.Order.ERR_ORDER_ALREADY_DELIVERED);
+        }
+
+        if (newStatus == OrderStatus.CANCELLED && currentStatus == OrderStatus.SHIPPED) {
+            throw new InvalidException(ErrorMessage.Order.ERR_CANCEL_ORDER);
+        }
+
+        if (!currentStatus.canTransitionTo(newStatus)) {
+            throw new InvalidException(String.format(ErrorMessage.Order.ERR_INVALID_STATUS_TRANSITION, currentStatus, newStatus));
+        }
+
+        if (newStatus == OrderStatus.CANCELLED) {
+            restoreStock(order);
+        }
+
+        order.setStatus(newStatus);
         orderRepository.save(order);
 
         return orderMapper.toOrderResponse(order);
@@ -211,21 +238,33 @@ public class OrderServiceImpl implements OrderService {
         }
 
         order.setStatus(OrderStatus.CANCELLED);
-
-        // Restore stock
-        List<String> updatedProductIds = new ArrayList<>();
-        for (OrderDetail detail : order.getOrderDetails()) {
-            Product product = detail.getProduct();
-            product.setStockQuantity(product.getStockQuantity() + detail.getQuantity());
-            productRepository.save(product);
-            updatedProductIds.add(product.getId());
-        }
-
-        evictProductCaches(updatedProductIds);
-
+        restoreStock(order);
         orderRepository.save(order);
 
         return orderMapper.toOrderResponse(order);
+    }
+
+    private void restoreStock(Order order) {
+        if (order.getOrderDetails() == null || order.getOrderDetails().isEmpty()) {
+            return;
+        }
+
+        List<Product> productsToUpdate = new ArrayList<>();
+        List<String> updatedProductIds = new ArrayList<>();
+
+        for (OrderDetail detail : order.getOrderDetails()) {
+            Product product = detail.getProduct();
+            if (product != null) {
+                product.setStockQuantity(product.getStockQuantity() + detail.getQuantity());
+                productsToUpdate.add(product);
+                updatedProductIds.add(product.getId());
+            }
+        }
+
+        if (!productsToUpdate.isEmpty()) {
+            productRepository.saveAll(productsToUpdate);
+            evictProductCaches(updatedProductIds);
+        }
     }
 
     @Override

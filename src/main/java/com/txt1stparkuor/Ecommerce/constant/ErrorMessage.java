@@ -83,6 +83,10 @@ public class ErrorMessage {
         public static final String ERR_CANCEL_ORDER = "Order cannot be cancelled in its current state.";
         public static final String ERR_RECOVER_IDEMPOTENT = "Error recovering idempotent order";
         public static final String ERR_NOT_ENOUGH_STOCK_FOR_ORDER = "One or more products do not have enough stock for this order.";
+        public static final String ERR_ORDER_SAME_STATUS = "Order is already in %s status.";
+        public static final String ERR_ORDER_ALREADY_CANCELLED = "Order is already cancelled and cannot be modified.";
+        public static final String ERR_ORDER_ALREADY_DELIVERED = "Order is already delivered and cannot be modified.";
+        public static final String ERR_INVALID_STATUS_TRANSITION = "Cannot change order status from %s to %s.";
     }
 
     public static class PasswordResetToken {
