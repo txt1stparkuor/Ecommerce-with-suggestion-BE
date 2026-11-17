@@ -117,6 +117,18 @@ public class UrlConstant {
         }
     }
 
+    public static class Analytics {
+        private static final String PRE_FIX = "/analytics";
+        public static final String SALES_SUMMARY = PRE_FIX + "/sales/summary";
+        public static final String SALES_TREND = PRE_FIX + "/sales/trend";
+        public static final String TOP_PRODUCTS = PRE_FIX + "/products/top";
+        public static final String LOW_STOCK = PRE_FIX + "/inventory/low-stock";
+        public static final String PENDING_ORDERS_COUNT = PRE_FIX + "/orders/pending-count";
+
+        private Analytics() {
+        }
+    }
+
     public static final String[] PUBLIC_POST_END_POINTS = {
             BASE_URL + Auth.LOGIN,
             BASE_URL + Auth.REGISTER,
