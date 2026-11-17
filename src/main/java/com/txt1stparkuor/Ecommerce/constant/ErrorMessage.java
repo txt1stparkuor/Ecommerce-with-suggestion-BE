@@ -93,4 +93,16 @@ public class ErrorMessage {
         public static final String INVALID_TOKEN = "Invalid token";
         public static final String TOKEN_EXPIRED = "Token expired";
     }
+
+    public static class Analytics {
+        public static final String ERR_DATE_RANGE_INVALID = "The 'from' date must be before or equal to the 'to' date.";
+        public static final String ERR_DATE_RANGE_EXCEEDED = "The date range cannot exceed 90 days.";
+        public static final String ERR_DATE_RANGE_EXCEEDED_YEAR = "The date range cannot exceed 1 year.";
+        public static final String ERR_LIMIT_MIN = "Limit must be at least 1.";
+        public static final String ERR_LIMIT_MAX = "Limit cannot exceed 100.";
+        public static final String ERR_DAYS_MIN = "Days must be at least 1.";
+        public static final String ERR_DAYS_MAX = "Days cannot exceed 90.";
+        public static final String ERR_THRESHOLD_MIN = "Threshold must be at least 0.";
+        public static final String ERR_THRESHOLD_MAX = "Threshold cannot exceed 1000.";
+    }
 }

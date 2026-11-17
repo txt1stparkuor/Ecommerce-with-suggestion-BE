@@ -1,5 +1,7 @@
 package com.txt1stparkuor.Ecommerce.constant.enums;
 
+import java.util.Set;
+
 public enum OrderStatus {
     PENDING,
     PROCESSING,
@@ -18,4 +20,10 @@ public enum OrderStatus {
             case DELIVERED, CANCELLED -> false;
         };
     }
+
+     public static final Set<OrderStatus> COMPLETED_SALES = Set.of(
+            PROCESSING,
+            SHIPPED,
+            DELIVERED
+    );
 }

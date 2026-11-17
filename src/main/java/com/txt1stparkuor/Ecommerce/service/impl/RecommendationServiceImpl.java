@@ -54,7 +54,7 @@ public class RecommendationServiceImpl implements RecommendationService {
             PythonRecommendationResponseDto response = restTemplate.getForObject(url, PythonRecommendationResponseDto.class);
             return processPythonResponse(response);
         } catch (Exception e) {
-            log.error("Failed to fetch similar products from Python service: {}", e.getMessage(), e);
+            // log.error("Failed to fetch similar products from Python service: {}", e.getMessage(), e);
             return new PaginationResponseDto<>(null, Collections.emptyList());
         }
     }
@@ -73,7 +73,7 @@ public class RecommendationServiceImpl implements RecommendationService {
             PythonRecommendationResponseDto response = restTemplate.getForObject(url, PythonRecommendationResponseDto.class);
             return processPythonResponse(response);
         } catch (Exception e) {
-            log.error("Failed to fetch user recommendations from Python service: {}", e.getMessage(), e);
+            // log.error("Failed to fetch user recommendations from Python service: {}", e.getMessage(), e);
             return new PaginationResponseDto<>(null, Collections.emptyList());
         }
     }
@@ -92,7 +92,7 @@ public class RecommendationServiceImpl implements RecommendationService {
             return processPythonResponse(response);
 
         } catch (Exception e) {
-            log.error("Failed to fetch hybrid products recommendations from Python service: {}", e.getMessage(), e);
+            // log.error("Failed to fetch hybrid products recommendations from Python service: {}", e.getMessage(), e);
             return new PaginationResponseDto<>(null, Collections.emptyList());
         }
     }
