@@ -13,11 +13,16 @@ import com.txt1stparkuor.Ecommerce.service.RecommendationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -37,6 +42,14 @@ public class RecommendationServiceImpl implements RecommendationService {
     private final ProductMapper productMapper;
     @Value("${python.service.url:http://localhost:8000}")
     private String pythonServiceUrl;
+    @Value("${python.service.secret:default-internal-secret-key}")
+    private String pythonServiceSecret;
+
+    private HttpHeaders createInternalHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-Internal-Token", pythonServiceSecret);
+        return headers;
+    }
 
     @Override
     @Cacheable(
@@ -51,10 +64,19 @@ public class RecommendationServiceImpl implements RecommendationService {
                 .buildAndExpand(productId)
                 .toUriString();
         try {
-            PythonRecommendationResponseDto response = restTemplate.getForObject(url, PythonRecommendationResponseDto.class);
-            return processPythonResponse(response);
+            HttpEntity<Void> entity = new HttpEntity<>(createInternalHeaders());
+            ResponseEntity<PythonRecommendationResponseDto> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    entity,
+                    PythonRecommendationResponseDto.class
+            );
+            return processPythonResponse(response.getBody());
+        } catch (HttpClientErrorException.Unauthorized e) {
+            log.error("Unauthorized access to Python recommendation service for similar products: {}", e.getMessage());
+            return new PaginationResponseDto<>(null, Collections.emptyList());
         } catch (Exception e) {
-            // log.error("Failed to fetch similar products from Python service: {}", e.getMessage(), e);
+            log.error("Failed to fetch similar products from Python service: {}", e.getMessage(), e);
             return new PaginationResponseDto<>(null, Collections.emptyList());
         }
     }
@@ -70,10 +92,19 @@ public class RecommendationServiceImpl implements RecommendationService {
                 .toUriString();
 
         try {
-            PythonRecommendationResponseDto response = restTemplate.getForObject(url, PythonRecommendationResponseDto.class);
-            return processPythonResponse(response);
+            HttpEntity<Void> entity = new HttpEntity<>(createInternalHeaders());
+            ResponseEntity<PythonRecommendationResponseDto> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    entity,
+                    PythonRecommendationResponseDto.class
+            );
+            return processPythonResponse(response.getBody());
+        } catch (HttpClientErrorException.Unauthorized e) {
+            log.error("Unauthorized access to Python recommendation service for user recommendations: {}", e.getMessage());
+            return new PaginationResponseDto<>(null, Collections.emptyList());
         } catch (Exception e) {
-            // log.error("Failed to fetch user recommendations from Python service: {}", e.getMessage(), e);
+            log.error("Failed to fetch user recommendations from Python service: {}", e.getMessage(), e);
             return new PaginationResponseDto<>(null, Collections.emptyList());
         }
     }
@@ -88,11 +119,19 @@ public class RecommendationServiceImpl implements RecommendationService {
                 .buildAndExpand(userId)
                 .toUriString();
         try {
-            PythonRecommendationResponseDto response = restTemplate.getForObject(url, PythonRecommendationResponseDto.class);
-            return processPythonResponse(response);
-
+            HttpEntity<Void> entity = new HttpEntity<>(createInternalHeaders());
+            ResponseEntity<PythonRecommendationResponseDto> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    entity,
+                    PythonRecommendationResponseDto.class
+            );
+            return processPythonResponse(response.getBody());
+        } catch (HttpClientErrorException.Unauthorized e) {
+            log.error("Unauthorized access to Python recommendation service for hybrid recommendations: {}", e.getMessage());
+            return new PaginationResponseDto<>(null, Collections.emptyList());
         } catch (Exception e) {
-            // log.error("Failed to fetch hybrid products recommendations from Python service: {}", e.getMessage(), e);
+            log.error("Failed to fetch hybrid products recommendations from Python service: {}", e.getMessage(), e);
             return new PaginationResponseDto<>(null, Collections.emptyList());
         }
     }
